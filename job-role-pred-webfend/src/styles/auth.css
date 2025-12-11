@@ -1,0 +1,118 @@
+.auth-root {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--glass);
+  padding: 40px 20px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffffcc;
+  backdrop-filter: blur(20px);
+  padding: 40px 32px;
+  border-radius: var(--radius);
+  box-shadow: 0 8px 30px rgba(14, 42, 71, 0.08);
+  animation: fadeIn 0.25s ease-out;
+}
+
+.auth-title {
+  font-size: 26px;
+  margin-bottom: 10px;
+  font-weight: 700;
+  color: var(--blue-dark);
+}
+
+.auth-subtitle {
+  font-size: 15px;
+  margin-bottom: 30px;
+  color: var(--blue-primary);
+  opacity: .8;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.auth-field label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--blue-dark);
+}
+
+.auth-field input {
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--blue-light);
+  font-size: 15px;
+  background: white;
+  outline: none;
+  transition: 0.2s;
+}
+
+.auth-field input:focus {
+  border-color: var(--blue-primary);
+  box-shadow: 0 0 0 3px rgba(30, 79, 163, 0.1);
+}
+
+.auth-btn {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: var(--blue-primary);
+  border: none;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  box-shadow: 0 6px 18px rgba(30, 79, 163, 0.20);
+  transition: 0.2s;
+}
+
+.auth-btn:hover {
+  transform: translateY(-2px);
+}
+
+.google-btn {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: white;
+  border: 1px solid var(--blue-light);
+  color: var(--blue-dark);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 14px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  transition: 0.2s;
+}
+
+.google-btn:hover {
+  background: #f3f6ff;
+}
+
+.auth-footer {
+  margin-top: 22px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--blue-primary);
+}
+
+.auth-footer a {
+  color: var(--blue-accent);
+  font-weight: 600;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
