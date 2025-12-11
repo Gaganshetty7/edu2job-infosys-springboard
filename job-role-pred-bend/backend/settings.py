@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-zqi+eud*y0g^h5$6m+vxl%@37ljdro9vkn=w@$zka=h*-$g2s)'
+SECRET_KEY = 'django-insecure-@cv(w5)2rzi0!nd^ulx=jw@3tzvxal)*qfkbb_mpxzvk83#3e5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -38,11 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Third-party apps
+     # Third-party
     'rest_framework',
     'corsheaders',
 
-    # Your apps
+    # Your app
     'accounts',
 ]
 
@@ -56,6 +56,13 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# CORS
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # React dev server
+]
+CORS_ALLOW_CREDENTIALS = True
+
 
 ROOT_URLCONF = 'backend.urls'
 
@@ -83,16 +90,17 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME':'infy_spring_gagan_db',
-        'USER': 'root',                    # Your MySQL username
-        'PASSWORD': 'gagan@007', # Your MySQL password
-        'HOST': 'localhost',               # Usually localhost
+        'NAME': 'infy_spring_gagan_db', 
+        'USER': 'root',                 
+        'PASSWORD': 'gagan@007',
+        'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
     }
 }
+
 
 
 # Password validation
@@ -136,16 +144,15 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CORS settings
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # your React dev server
-]
-CORS_ALLOW_CREDENTIALS = True
-
-#rest framework settings
+# REST Framework JWT
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
     )
 }
 
+# Custom User Model
+AUTH_USER_MODEL = 'accounts.Users'

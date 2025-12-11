@@ -1,22 +1,53 @@
 from django.db import models
+from django.conf import settings
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
-class Users(models.Model):
-    user_id = models.AutoField(primary_key=True)
+#User Manager
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, name, password=None, role='USER', **extra_fields):
+        if not email:
+            raise ValueError('Users must have an email address')
+        email = self.normalize_email(email)
+        user = self.model(email=email, name=name, role=role, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, name, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(email, name, password, role='ADMIN', **extra_fields)
+
+#User Model
+class Users(AbstractBaseUser, PermissionsMixin):
+    ROLE_CHOICES = (
+        ('USER', 'User'),
+        ('ADMIN', 'Admin'),
+    )
+
+    email = models.EmailField(unique=True)
     name = models.CharField(max_length=100)
-    email = models.CharField(max_length=100, unique=True)
-    password_hash = models.CharField(max_length=255)
-    role = models.CharField(max_length=10)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='USER')
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['name']
+
+    def __str__(self):
+        return self.email
 
     class Meta:
         db_table = 'users'
 
-
+# EDUCATION
 class Education(models.Model):
-    education_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(
-        Users,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        db_column='user_id'
+        related_name='educations'
     )
     degree = models.CharField(max_length=50)
     specialization = models.CharField(max_length=100)
@@ -27,13 +58,12 @@ class Education(models.Model):
     class Meta:
         db_table = 'education'
 
-
+# CERTIFICATION
 class Certification(models.Model):
-    cert_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(
-        Users,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        db_column='user_id'
+        related_name='certifications'
     )
     cert_name = models.CharField(max_length=100)
     issuing_organization = models.CharField(max_length=100)
@@ -42,13 +72,12 @@ class Certification(models.Model):
     class Meta:
         db_table = 'certification'
 
-
+# PREDICTION HISTORY
 class PredictionHistory(models.Model):
-    prediction_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(
-        Users,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        db_column='user_id'
+        related_name='prediction_histories'
     )
     predicted_roles = models.CharField(max_length=255)
     confidence_scores = models.DecimalField(max_digits=5, decimal_places=2)
@@ -57,20 +86,17 @@ class PredictionHistory(models.Model):
     class Meta:
         db_table = 'prediction_history'
 
-
+# ADMIN LOGS
 class AdminLogs(models.Model):
-    log_id = models.AutoField(primary_key=True)
     admin = models.ForeignKey(
-        Users,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='admin_logs',
-        db_column='admin_id'
+        related_name='admin_logs'
     )
     target_user = models.ForeignKey(
-        Users,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='target_logs',
-        db_column='target_user_id'
+        related_name='target_logs'
     )
     action_type = models.CharField(max_length=255)
     timestamp = models.DateTimeField(auto_now_add=True)
