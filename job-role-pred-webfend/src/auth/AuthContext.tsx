@@ -90,14 +90,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return { ok: true, msg: "Login successful" }; // ✅ always include msg
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        console.log(err.response?.data || err.message);
+        // Backend response exists
+        if (err.response) {
+          console.log("Axios error response data:", err.response.data);
+          console.log("Axios error response status:", err.response.status);
+          console.log("Axios error response headers:", err.response.headers);
+        } else {
+          console.log("Axios error message:", err.message);
+        }
       } else if (err instanceof Error) {
-        console.log(err.message);
+        console.log("Error message:", err.message);
       } else {
-        console.log(err);
+        console.log("Unknown error:", err);
       }
-      return { ok: false, msg: "Google login failed" }; // ✅ always include msg
-    }
+
+      // Optional: show backend error in UI for debugging (can remove later)
+      const backendMsg = axios.isAxiosError(err) && err.response?.data?.error
+        ? err.response.data.error
+        : "Google login failed";
+
+      return { ok: false, msg: backendMsg };
+    };
+
   };
 
 
