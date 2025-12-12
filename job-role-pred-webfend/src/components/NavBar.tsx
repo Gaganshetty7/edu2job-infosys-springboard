@@ -13,15 +13,32 @@ const NavBar = () => {
 
       <div style={styles.navButtonsDiv}>
         {user ? (
-          <button
-            style={styles.navButtonPrimary}
-            onClick={() => {
-              logout();
-              navigate("/");
-            }}
-          >
-            Logout
-          </button>
+          <>
+            <a style={styles.navLink}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/dashboard");
+              }}>Dashboard</a>
+            <a style={styles.navLink}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/predict");
+              }}>Predict</a>
+            <a style={styles.navLink}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/profile");
+              }}>Profile</a>
+            <button
+              style={styles.navButtonPrimary}
+              onClick={() => {
+                logout();
+                navigate("/");
+              }}
+            >
+              Logout
+            </button>
+          </>
         ) : (
           <>
             <button style={styles.navButtonOutline} onClick={() => navigate("/login")}>
@@ -57,7 +74,7 @@ const styles: { [key: string]: CSSProperties } = {
   navButtonsDiv: {
     display: "flex",
     alignItems: "center",
-    gap: "12px",
+    gap: "20px",
   },
   navButtonOutline: {
     backgroundColor: "transparent",
@@ -79,6 +96,13 @@ const styles: { [key: string]: CSSProperties } = {
     fontWeight: 600,
     cursor: "pointer",
   },
+  navLink: {
+    color: "#1e4fa3",
+    textDecoration: "none",
+    fontSize: "15px",
+    fontWeight: 600,
+    cursor: "pointer",
+  }
 };
 
 export default NavBar;

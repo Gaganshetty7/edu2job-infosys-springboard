@@ -1,0 +1,268 @@
+:root {
+    --bg: #f7f9fc;
+    --accent: #1e4fa3;
+    --muted: #7b8390;
+    --glass: rgba(255, 255, 255, 0.6);
+    --glass-border: rgba(10, 20, 40, 0.06);
+    --shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    --radius: 14px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 0px;
+}
+
+.pgHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 65px;
+}
+
+.pgTitle {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.pgSub {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.runBtn {
+    margin-left: auto;
+    background: var(--accent);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.page {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 28px;
+    padding-bottom: 30px;
+    align-items: flex-start;
+}
+
+.glassBox {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow);
+    padding: 18px;
+    border-radius: var(--radius);
+    backdrop-filter: blur(10px);
+}
+
+/* LEFT FORM */
+.leftBox {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-self: flex-start;
+}
+
+.cardTitle {
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.lbl {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.input {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: white;
+    font-size: 14px;
+}
+
+.input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15);
+}
+
+/* Buttons */
+.btnRow {
+    display: flex;
+    gap: 12px;
+}
+
+.btnPrimary {
+    background: var(--accent);
+    border: none;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.btnOutline {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: white;
+    cursor: pointer;
+}
+
+/* RIGHT RESULTS */
+.rightBox {
+    flex: 1;
+}
+
+.predHeader {
+    font-weight: 700;
+}
+
+.predWrap {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.empty {
+    background: rgba(255, 255, 255, 0.7);
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px dashed rgba(0, 0, 0, 0.08);
+    color: var(--muted);
+}
+
+.hint {
+    margin-top: 6px;
+    font-size: 13px;
+}
+
+.roleCard {
+    background: white;
+    padding: 14px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.roleRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.roleTitle {
+    font-weight: 700;
+}
+
+.confVal {
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.confBar {
+    height: 10px;
+    background: #eef1f6;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.confFill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #0061d5);
+    transition: 0.4s;
+}
+
+/* BOTTOM PREV PANEL */
+
+.prevHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.prevPanel {
+    padding: 22px;
+}
+
+.prevTitle {
+    font-weight: 700;
+    margin-bottom: 14px;
+    font-size: 17px;
+    color: var(--accent);
+}
+
+.clear-btn {
+    background: var(--accent);
+    color: white;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.prevList {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.prevItem {
+    background: white;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.prevTop {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.prevMeta {
+    font-size: 14px;
+}
+
+.prevTime {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.prevRoles {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.prevRoleTag {
+    background: #eef4ff;
+    color: #0553c9;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.emptySmall {
+    padding: 20px;
+    color: var(--muted);
+    border: 1px dashed rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* Responsive */
+@media(max-width:980px) {
+    .page {
+        grid-template-columns: 1fr;
+    }
+
+    .runBtn {
+        display: none;
+    }
+}

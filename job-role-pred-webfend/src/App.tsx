@@ -4,7 +4,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import Dashboard from "./pages/DashboardPage";
+import Dashboard, { exampleData } from "./pages/DashboardPage";
+import ProfilePage from "./pages/ProfilePage";
+import PredictionPage from "./pages/PredictionPage";
 
 import ProtectedRoute from "./auth/ProtectedRoute";
 
@@ -19,11 +21,30 @@ function App() {
         <Route path="/signup" element={<RegisterPage />} />
 
         {/* Protected route */}
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/predict"
+          element={
+            <ProtectedRoute>
+              <PredictionPage />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <Dashboard {...exampleData} />
             </ProtectedRoute>
           }
         />

@@ -2,6 +2,9 @@
 import NavBar from "../components/NavBar";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import careerIcon from "../assets/images/icons8-career-100.png";
+import Footer from "../components/Footer";
+
 import "./../styles/landing.css";
 
 export default function LandingPage() {
@@ -21,7 +24,7 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <main className="main">
-        <section className="hero">
+        <div className="hero">
           <div className="container hero-inner">
             <div className="hero-text">
               <h1 className="hero-title">Predict Your Job from Your Education</h1>
@@ -35,22 +38,14 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="hero-illustration">
-              {/* Optional illustration or image */}
+              <img className="careerIcon" src={careerIcon} />
             </div>
           </div>
-        </section>
+        </div>
       </main>
 
-      {/* Footer */}
-      <footer className="footer">
-        <div className="container footer-inner">
-          <div>© {new Date().getFullYear()} Edu2Job — Job prediction from education</div>
-          <div className="footer-links">
-            <a href="#privacy">Privacy</a>
-            <a href="#terms">Terms</a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
+      
     </div>
   );
 }
