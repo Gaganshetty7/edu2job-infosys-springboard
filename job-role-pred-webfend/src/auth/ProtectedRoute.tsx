@@ -8,5 +8,5 @@ export default function ProtectedRoute({ children }: PropsWithChildren) {
 
   const isLoggedIn = !!user && !!accessToken;
 
-  return isLoggedIn ? <>{children}</> : <Navigate to="/login" replace />;
+  return isLoggedIn ? <>{children}</> : <Navigate to="/" replace />;
 }

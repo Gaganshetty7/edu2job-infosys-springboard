@@ -1,0 +1,154 @@
+.edit-root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.edit-main {
+    flex: 1;
+    background: #f6f7f9;
+    padding: 32px 0 56px;
+}
+
+.edit-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 30px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+}
+
+/* Titles */
+.edit-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e4fa3;
+}
+
+.edit-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.edit-section {
+    font-size: 15px;
+    font-weight: 700;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+.edit-section-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1e4fa3;
+    margin-bottom: 12px;
+}
+
+/* Form groups */
+.edit-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.edit-group label {
+    font-size: 13px;
+    color: #555;
+}
+
+.edit-group input {
+    border: 1px solid #d7d7d7;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    background: #fafafa;
+    outline: none;
+    transition: border 0.15s, background 0.15s;
+}
+
+.edit-group input:focus {
+    border-color: #1e4fa3;
+    background: #ffffff;
+}
+
+/* Info inputs */
+.info-input {
+    width: 50%;
+}
+
+/* Grid for repeated rows (Education/Certification) */
+
+
+.edit-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0px 18px;
+    margin-bottom: 20px;
+    padding: 12px;
+    border-radius: 20px;
+    background-color: #efefef;
+}
+
+/* Add / Remove actions */
+.edit-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.AddMoreLink{
+    font-size: 13px;
+    color: #1e4fa3;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.15s;
+}
+
+.RemoveLink {
+    font-size: 13px;
+    color: #d82929;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.15s;
+}
+
+.RemoveLink.disabled {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Save button */
+.edit-save {
+    margin-top: 10px;
+    padding: 11px 18px;
+    border-radius: 10px;
+    border: none;
+    background: #1e4fa3;
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+}
+
+.edit-save:hover {
+    background: #0060d1;
+    transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+    .edit-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .edit-container {
+        padding: 20px;
+    }
+
+    .info-input {
+        width: 100%;
+    }
+}

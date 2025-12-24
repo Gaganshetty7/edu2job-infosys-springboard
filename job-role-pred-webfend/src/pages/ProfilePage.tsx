@@ -1,10 +1,12 @@
 import NavBar from "../components/NavBar";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import Footer from "../components/Footer";
 import "../styles/profile.css";
 
 export default function StudentProfilePage() {
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     return (
         <div className="root">
@@ -24,7 +26,7 @@ export default function StudentProfilePage() {
                                 <p className="ProfileEmail">{user?.email}</p>
                             </div>
 
-                            <button className="EditBtn">Edit Details</button>
+                            <button className="EditBtn" onClick={()=>{navigate("/edit-profile")}}>Edit Details</button>
                         </div>
                     </div>
 

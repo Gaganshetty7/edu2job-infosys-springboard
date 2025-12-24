@@ -7,6 +7,7 @@ import RegisterPage from "./pages/RegisterPage";
 import Dashboard, { exampleData } from "./pages/DashboardPage";
 import ProfilePage from "./pages/ProfilePage";
 import PredictionPage from "./pages/PredictionPage";
+import EditProfilePage from "./pages/EditProfilePage";
 
 import ProtectedRoute from "./auth/ProtectedRoute";
 
@@ -45,6 +46,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Dashboard {...exampleData} />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/edit-profile"
+          element={
+            <ProtectedRoute>
+              <EditProfilePage />
             </ProtectedRoute>
           }
         />
