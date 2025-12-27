@@ -3,6 +3,9 @@ from django.contrib.auth import authenticate
 from .models import Users, Education, Certification, PredictionHistory, AdminLogs
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+# -------------------------------
+# JWT Token Serializer (Custom)
+# -------------------------------
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -12,7 +15,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     def validate(self, attrs):
         data = super().validate(attrs)
-        # Add extra responses here
+        # Include additional user info in the login response
         data.update({
             "user_id": self.user.id,
             "email": self.user.email,
@@ -21,6 +24,10 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         })
         return data
 
+
+# -------------------------------
+# Email/Password Login Serializer
+# -------------------------------
 class EmailAuthTokenSerializer(serializers.Serializer):
     email = serializers.EmailField(label="Email")
     password = serializers.CharField(label="Password", style={'input_type': 'password'}, trim_whitespace=False)
@@ -30,7 +37,7 @@ class EmailAuthTokenSerializer(serializers.Serializer):
         password = attrs.get('password')
 
         if email and password:
-            # Use authenticate with email
+            # Authenticate user using email
             user = authenticate(request=self.context.get('request'), email=email, password=password)
             if not user:
                 raise serializers.ValidationError('Unable to log in with provided credentials.', code='authorization')
@@ -39,7 +46,11 @@ class EmailAuthTokenSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
-    
+
+
+# -------------------------------
+# Base Serializers for Models
+# -------------------------------
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Users
@@ -64,3 +75,42 @@ class AdminLogsSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdminLogs
         fields = ['id', 'admin', 'target_user', 'action_type', 'timestamp']
+
+
+# -------------------------------
+# Nested Serializers for Profile
+# -------------------------------
+class EducationNestedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Education
+        fields = ['degree', 'specialization', 'university', 'cgpa', 'year_of_completion']
+
+class CertificationNestedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Certification
+        fields = ['cert_name', 'issuing_organization', 'issue_date']
+
+class PredictionHistoryNestedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PredictionHistory
+        fields = ['predicted_roles', 'confidence_scores', 'timestamp']
+
+
+# -------------------------------
+# Combined Profile Serializer
+# -------------------------------
+class UserProfileSerializer(serializers.ModelSerializer):
+    # Include related models as nested fields
+    educations = EducationNestedSerializer(many=True, read_only=True)
+    certifications = CertificationNestedSerializer(many=True, read_only=True)
+    prediction_histories = PredictionHistoryNestedSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Users
+        # Return user info + all nested data for profile page
+        fields = [
+            'id', 'email', 'name', 'role',
+            'educations',
+            'certifications',
+            'prediction_histories'
+        ]

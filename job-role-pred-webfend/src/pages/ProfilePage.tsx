@@ -1,12 +1,60 @@
+import { useEffect, useState } from "react";
 import NavBar from "../components/NavBar";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../auth/AuthContext";
 import Footer from "../components/Footer";
+import api from "../api/axiosInstance";
 import "../styles/profile.css";
+import { useAuth } from "../auth/AuthContext";
 
-export default function StudentProfilePage() {
-    const { user } = useAuth();
+interface Education {
+    id: number;
+    degree: string;
+    specialization: string;
+    university: string;
+    cgpa: number;
+    year_of_completion: number;
+}
+
+interface Certification {
+    id: number;
+    cert_name: string;
+    issuing_organization: string;
+}
+
+interface UserProfile {
+    id: number;
+    email: string;
+    name: string;
+    role: string;
+    educations: Education[];
+    certifications: Certification[];
+}
+
+export default function UserProfilePage() {
+    const accessToken = useAuth();
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const [profile, setProfile] = useState<UserProfile | null>(null);
+
+    useEffect(() => {
+        if (!accessToken) return;   // ⛔ do NOT call until token exists
+
+        const fetchProfile = async () => {
+            try {
+                const res = await api.get("/accounts/myprofile/");
+                setProfile(res.data);
+            } catch (err: any) {
+                console.log("PROFILE FETCH FAILED:", err.response || err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProfile();
+    }, [accessToken]);
+
+    if (loading) return <div>Loading...</div>;
+    if (!profile) return <div>Error loading profile.</div>;
 
     return (
         <div className="root">
@@ -15,46 +63,69 @@ export default function StudentProfilePage() {
             <main className="main profile-main">
                 <div className="container profile-container">
 
-                    {/* ---------- BANNER ---------- */}
                     <div className="ProfileBanner">
                         <div className="ProfileBannerInner">
                             <img src="/profile.jpg" className="ProfilePhoto" />
 
                             <div className="ProfileHeader">
-                                <p className="ProfileName">{user?.name}</p>
-                                <p className="ProfileDegree">Master of Computer Applications</p>
-                                <p className="ProfileEmail">{user?.email}</p>
+                                <p className="ProfileName">{profile.name}</p>
+
+                                {profile.educations[0] ? (
+                                    <p className="ProfileDegree">
+                                        {profile.educations[0].degree} ({profile.educations[0].specialization})
+                                    </p>
+                                ) : (
+                                    <p className="ProfileDegree">No education added yet</p>
+                                )}
+
+                                <p className="ProfileEmail">{profile.email}</p>
                             </div>
 
-                            <button className="EditBtn" onClick={()=>{navigate("/edit-profile")}}>Edit Details</button>
+                            <button className="EditBtn" onClick={() => navigate("/edit-profile")}>
+                                Edit Details
+                            </button>
                         </div>
                     </div>
 
-                    {/* ---------- GRID ---------- */}
                     <div className="OverviewGrid">
 
-                        {/* Academic Card */}
                         <div className="ProfileCard AcademicCard">
                             <p className="CardTitle">Academic Profile</p>
                             <div className="CardContent">
-                                <p className="MainInfo">St. Aloysius University</p>
-                                <p className="SubInfo">MCA 2025</p>
-                                <p className="HighlightText">CGPA: 8.9</p>
+                                {profile.educations.length === 0 && (
+                                    <p className="SubInfo">No academic records yet</p>
+                                )}
+
+                                {profile.educations.map((edu) => (
+                                    <div key={edu.id}>
+                                        <p className="MainInfo">{edu.university}</p>
+                                        <p className="SubInfo">
+                                            {edu.degree} — {edu.year_of_completion}
+                                        </p>
+                                        <p className="HighlightText">CGPA: {edu.cgpa}</p>
+                                    </div>
+                                ))}
                             </div>
                             <span className="SeeMoreLink">See More</span>
                         </div>
 
-                        {/* Certifications Card */}
                         <div className="ProfileCard CertificationsCard">
                             <p className="CardTitle">Certifications</p>
                             <div className="CardContent">
-                                <p className="MainInfo">AWS Cloud Practitioner</p>
-                                <p className="SubInfo">Amazon Web Services</p>
+                                {profile.certifications.length === 0 && (
+                                    <p className="SubInfo">No certifications yet</p>
+                                )}
+
+                                {profile.certifications.map((cert) => (
+                                    <div key={cert.id}>
+                                        <p className="MainInfo">{cert.cert_name}</p>
+                                        <p className="SubInfo">{cert.issuing_organization}</p>
+                                    </div>
+                                ))}
                             </div>
                             <span className="SeeMoreLink">See More</span>
                         </div>
 
-                        {/* Placement Card */}
                         <div className="ProfileCard PlacementCard">
                             <p className="CardTitle">Placement Status</p>
                             <div className="CardContent">
@@ -65,7 +136,6 @@ export default function StudentProfilePage() {
                             <span className="SeeMoreLink">See More</span>
                         </div>
 
-                        {/* Skills Card */}
                         <div className="ProfileCard SkillsCard">
                             <p className="CardTitle">Skills</p>
                             <div className="CardContent">
@@ -75,13 +145,7 @@ export default function StudentProfilePage() {
                                     <span className="SkillTag">React</span>
                                     <span className="SkillTag">Java</span>
                                     <span className="SkillTag">AWS</span>
-                                    <span className="SkillTag">Cloud Computing</span>
                                     <span className="SkillTag">Django</span>
-                                    <span className="SkillTag">TypeScript</span>
-                                    <span className="SkillTag">Git</span>
-                                    <span className="SkillTag">Docker</span>
-                                    <span className="SkillTag">Linux</span>
-                                    <span className="SkillTag">Data Structures</span>
                                 </div>
                             </div>
                             <span className="SeeMoreLink">See More</span>
@@ -89,7 +153,6 @@ export default function StudentProfilePage() {
 
                     </div>
 
-                    {/* ---------- PROJECTS ---------- */}
                     <div className="ProjectsSection">
                         <p className="SectionTitle">Projects</p>
 

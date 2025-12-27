@@ -29,6 +29,20 @@ const NavBar = () => {
                 e.preventDefault();
                 navigate("/profile");
               }}>Profile</a>
+
+            {user?.role === "ADMIN" && (
+              <a
+                style={styles.navLink}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/admin");
+                }}
+              >
+                Admin Panel
+              </a>
+            )}
+
+
             <button
               style={styles.navButtonPrimary}
               onClick={() => {

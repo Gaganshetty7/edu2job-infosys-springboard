@@ -8,6 +8,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
 from google.oauth2 import id_token
 from google.auth.transport import requests
+from rest_framework.permissions import IsAuthenticated
+from .serializers import UserProfileSerializer
 
 from .models import Users, Education, Certification, PredictionHistory, AdminLogs
 from .serializers import (
@@ -124,3 +126,17 @@ class AdminLogsViewSet(viewsets.ModelViewSet):
     queryset = AdminLogs.objects.all()
     serializer_class = AdminLogsSerializer
     permission_classes = [permissions.IsAdminUser]
+
+# -------------------------------
+# Get Logged-in User Profile
+# -------------------------------
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def my_profile(request):
+    """
+    Returns the profile of the currently logged-in user,
+    including education, certifications, and prediction history.
+    """
+    user = request.user
+    serializer = UserProfileSerializer(user)
+    return Response(serializer.data)

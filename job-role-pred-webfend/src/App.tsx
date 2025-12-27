@@ -8,6 +8,8 @@ import Dashboard, { exampleData } from "./pages/DashboardPage";
 import ProfilePage from "./pages/ProfilePage";
 import PredictionPage from "./pages/PredictionPage";
 import EditProfilePage from "./pages/EditProfilePage";
+import AdminPanelPage from "./pages/AdminPanelPage";
+import AdminRoute from "./auth/AdminRoute";
 
 import ProtectedRoute from "./auth/ProtectedRoute";
 
@@ -58,6 +60,16 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminPanelPage />
+            </AdminRoute>
+          }
+        />
+
 
       </Routes>
     </BrowserRouter>

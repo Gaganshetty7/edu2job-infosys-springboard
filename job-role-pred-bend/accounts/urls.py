@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     UserViewSet, EducationViewSet, CertificationViewSet,
-    PredictionHistoryViewSet, AdminLogsViewSet, MyTokenObtainPairView, register_user
+    PredictionHistoryViewSet, AdminLogsViewSet, MyTokenObtainPairView, my_profile, register_user
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import google_login
@@ -20,4 +20,5 @@ urlpatterns = [
     path('register/', register_user, name='register_user'),
     path('login/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path("myprofile/", my_profile, name="my_profile"),
 ]
