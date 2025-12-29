@@ -37,7 +37,7 @@ export default function UserProfilePage() {
     const [profile, setProfile] = useState<UserProfile | null>(null);
 
     useEffect(() => {
-        if (!accessToken) return;   // ⛔ do NOT call until token exists
+        if (!accessToken) return;   // do NOT call until token exists
 
         const fetchProfile = async () => {
             try {
