@@ -11,7 +11,7 @@ from google.auth.transport import requests
 from rest_framework.permissions import IsAuthenticated
 from .serializers import UserProfileSerializer
 
-from .models import Users, Education, Certification, PredictionHistory, AdminLogs
+from .models import Users, Education, Certification, PredictionHistory, AdminLogs, PlacementStatus, Skill, Project
 from .serializers import (
     UserSerializer,
     EducationSerializer,
@@ -19,6 +19,9 @@ from .serializers import (
     PredictionHistorySerializer,
     AdminLogsSerializer,
     MyTokenObtainPairSerializer,
+    PlacementStatusSerializer,
+    SkillSerializer,
+    ProjectSerializer
 )
 
 # -----------------------------
@@ -126,6 +129,22 @@ class AdminLogsViewSet(viewsets.ModelViewSet):
     queryset = AdminLogs.objects.all()
     serializer_class = AdminLogsSerializer
     permission_classes = [permissions.IsAdminUser]
+    
+class PlacementStatusViewSet(viewsets.ModelViewSet):
+    queryset = PlacementStatus.objects.all()
+    serializer_class = PlacementStatusSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class SkillViewSet(viewsets.ModelViewSet):
+    queryset = Skill.objects.all()
+    serializer_class = SkillSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class ProjectViewSet(viewsets.ModelViewSet):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
 
 # -------------------------------
 # Get Logged-in User Profile

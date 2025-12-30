@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import Users, Education, Certification, PredictionHistory, AdminLogs
+from .models import Users, Education, Certification, PredictionHistory, AdminLogs, PlacementStatus, Skill, Project
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 # -------------------------------
@@ -76,6 +76,21 @@ class AdminLogsSerializer(serializers.ModelSerializer):
         model = AdminLogs
         fields = ['id', 'admin', 'target_user', 'action_type', 'timestamp']
 
+class PlacementStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlacementStatus
+        fields = ['company', 'job_title']
+
+class SkillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Skill
+        fields = ['skill_name']
+
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ['title', 'description']
+
 
 # -------------------------------
 # Nested Serializers for Profile
@@ -95,6 +110,21 @@ class PredictionHistoryNestedSerializer(serializers.ModelSerializer):
         model = PredictionHistory
         fields = ['predicted_roles', 'confidence_scores', 'timestamp']
 
+class PlacementStatusNestedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlacementStatus
+        fields = ['company', 'job_title']
+
+class SkillNestedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Skill
+        fields = ['skill_name']
+
+class ProjectNestedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ['title', 'description']
+
 
 # -------------------------------
 # Combined Profile Serializer
@@ -104,6 +134,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
     educations = EducationNestedSerializer(many=True, read_only=True)
     certifications = CertificationNestedSerializer(many=True, read_only=True)
     prediction_histories = PredictionHistoryNestedSerializer(many=True, read_only=True)
+    placement_status = PlacementStatusNestedSerializer(read_only=True)
+    skills = SkillNestedSerializer(many=True, read_only=True)
+    projects = ProjectNestedSerializer(many=True, read_only=True)
 
     class Meta:
         model = Users
@@ -112,5 +145,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'id', 'email', 'name', 'role',
             'educations',
             'certifications',
-            'prediction_histories'
+            'prediction_histories',
+            'placement_status',
+            'skills',
+            'projects'
         ]

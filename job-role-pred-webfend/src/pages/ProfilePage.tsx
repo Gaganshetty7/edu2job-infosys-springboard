@@ -21,6 +21,21 @@ interface Certification {
     issuing_organization: string;
 }
 
+/* NEW types (all optional for now) */
+interface PlacementStatus {
+    job_title: string;
+    company: string;
+}
+
+interface Skill {
+    skill_name: string;
+}
+
+interface Project {
+    title: string;
+    description: string;
+}
+
 interface UserProfile {
     id: number;
     email: string;
@@ -28,6 +43,11 @@ interface UserProfile {
     role: string;
     educations: Education[];
     certifications: Certification[];
+
+    /* Optional — backend will add later */
+    placement_status?: PlacementStatus | null;
+    skills?: Skill[] | null;
+    projects?: Project[] | null;
 }
 
 export default function UserProfilePage() {
@@ -37,14 +57,14 @@ export default function UserProfilePage() {
     const [profile, setProfile] = useState<UserProfile | null>(null);
 
     useEffect(() => {
-        if (!accessToken) return;   // do NOT call until token exists
+        if (!accessToken) return;
 
         const fetchProfile = async () => {
             try {
                 const res = await api.get("/accounts/myprofile/");
                 setProfile(res.data);
             } catch (err: any) {
-                console.log("PROFILE FETCH FAILED:", err.response || err);
+                console.log("PROFILE FETCH FAILED:", err?.response || err);
             } finally {
                 setLoading(false);
             }
@@ -81,7 +101,10 @@ export default function UserProfilePage() {
                                 <p className="ProfileEmail">{profile.email}</p>
                             </div>
 
-                            <button className="EditBtn" onClick={() => navigate("/edit-profile")}>
+                            <button
+                                className="EditBtn"
+                                onClick={() => navigate("/edit-profile")}
+                            >
                                 Edit Details
                             </button>
                         </div>
@@ -89,8 +112,10 @@ export default function UserProfilePage() {
 
                     <div className="OverviewGrid">
 
+                        {/* Academic */}
                         <div className="ProfileCard AcademicCard">
                             <p className="CardTitle">Academic Profile</p>
+
                             <div className="CardContent">
                                 {profile.educations.length === 0 && (
                                     <p className="SubInfo">No academic records yet</p>
@@ -106,11 +131,14 @@ export default function UserProfilePage() {
                                     </div>
                                 ))}
                             </div>
+
                             <span className="SeeMoreLink">See More</span>
                         </div>
 
+                        {/* Certifications */}
                         <div className="ProfileCard CertificationsCard">
                             <p className="CardTitle">Certifications</p>
+
                             <div className="CardContent">
                                 {profile.certifications.length === 0 && (
                                     <p className="SubInfo">No certifications yet</p>
@@ -123,50 +151,65 @@ export default function UserProfilePage() {
                                     </div>
                                 ))}
                             </div>
+
                             <span className="SeeMoreLink">See More</span>
                         </div>
 
+                        {/* Placement */}
                         <div className="ProfileCard PlacementCard">
                             <p className="CardTitle">Placement Status</p>
+
                             <div className="CardContent">
-                                <p className="MainInfo">Python Stack Developer</p>
-                                <p className="SubInfo">Infosys</p>
-                                <p className="SmallNote">Joining: July 2025</p>
+                                {!profile.placement_status ? (
+                                    <p className="SubInfo">No placement status added yet</p>
+                                ) : (
+                                    <>
+                                        <p className="MainInfo">{profile.placement_status.job_title}</p>
+                                        <p className="SubInfo">{profile.placement_status.company}</p>
+                                    </>
+                                )}
                             </div>
+
                             <span className="SeeMoreLink">See More</span>
                         </div>
 
+                        {/* Skills */}
                         <div className="ProfileCard SkillsCard">
                             <p className="CardTitle">Skills</p>
+
                             <div className="CardContent">
-                                <div className="SkillsList">
-                                    <span className="SkillTag">Python</span>
-                                    <span className="SkillTag">MySQL</span>
-                                    <span className="SkillTag">React</span>
-                                    <span className="SkillTag">Java</span>
-                                    <span className="SkillTag">AWS</span>
-                                    <span className="SkillTag">Django</span>
-                                </div>
+                                {!profile.skills || profile.skills.length === 0 ? (
+                                    <p className="SubInfo">No skills added yet</p>
+                                ) : (
+                                    <div className="SkillsList">
+                                        {profile.skills.map((skill, index) => (
+                                            <span key={index} className="SkillTag">
+                                                {skill.skill_name} {/* <-- Corrected */}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
+
                             <span className="SeeMoreLink">See More</span>
                         </div>
 
                     </div>
 
+                    {/* Projects */}
                     <div className="ProjectsSection">
-                        <p className="SectionTitle">Projects</p>
+                        <p className="CardTitle">Projects</p>
 
-                        <div className="ProjectCard">
-                            <h3 className="ProjectTitle">Digpal – Personal Safety App</h3>
-                            <p className="ProjectDesc">React Native + Django SOS and night travel system.</p>
-                        </div>
-
-                        <div className="ProjectCard">
-                            <h3 className="ProjectTitle">CareerPath.ai</h3>
-                            <p className="ProjectDesc">
-                                AI + Human powered career guidance with real-time suggestions.
-                            </p>
-                        </div>
+                        {!profile.projects || profile.projects.length === 0 ? (
+                            <p className="SubInfo">No projects added yet</p>
+                        ) : (
+                            profile.projects.map((project, index) => (
+                                <div key={index} className="ProjectCard">
+                                    <h3 className="ProjectTitle">{project.title}</h3>
+                                    <p className="ProjectDesc">{project.description}</p>
+                                </div>
+                            ))
+                        )}
                     </div>
 
                 </div>

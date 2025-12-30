@@ -2,7 +2,9 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
-#User Manager
+# -------------------------------
+# User Manager
+# -------------------------------
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, name, password=None, role='USER', **extra_fields):
         if not email:
@@ -18,7 +20,10 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, name, password, role='ADMIN', **extra_fields)
 
-#User Model
+
+# -------------------------------
+# User Model
+# -------------------------------
 class Users(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = (
         ('USER', 'User'),
@@ -42,7 +47,10 @@ class Users(AbstractBaseUser, PermissionsMixin):
     class Meta:
         db_table = 'users'
 
-# EDUCATION
+
+# -------------------------------
+# Education
+# -------------------------------
 class Education(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -58,7 +66,10 @@ class Education(models.Model):
     class Meta:
         db_table = 'education'
 
-# CERTIFICATION
+
+# -------------------------------
+# Certification
+# -------------------------------
 class Certification(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -72,7 +83,10 @@ class Certification(models.Model):
     class Meta:
         db_table = 'certification'
 
-# PREDICTION HISTORY
+
+# -------------------------------
+# Prediction History
+# -------------------------------
 class PredictionHistory(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -86,7 +100,10 @@ class PredictionHistory(models.Model):
     class Meta:
         db_table = 'prediction_history'
 
-# ADMIN LOGS
+
+# -------------------------------
+# Admin Logs
+# -------------------------------
 class AdminLogs(models.Model):
     admin = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -103,3 +120,51 @@ class AdminLogs(models.Model):
 
     class Meta:
         db_table = 'admin_logs'
+
+
+# -------------------------------
+# Placement Status
+# -------------------------------
+class PlacementStatus(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='placement_status'
+    )
+    company = models.CharField(max_length=255)
+    job_title = models.CharField(max_length=255)
+    joining_date = models.DateField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'placement_status'
+
+
+# -------------------------------
+# Skills
+# -------------------------------
+class Skill(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='skills'
+    )
+    skill_name = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'skills'
+
+
+# -------------------------------
+# Projects
+# -------------------------------
+class Project(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='projects'
+    )
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+
+    class Meta:
+        db_table = 'projects'

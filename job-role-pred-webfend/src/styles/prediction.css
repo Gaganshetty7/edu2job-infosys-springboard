@@ -105,6 +105,12 @@
     cursor: pointer;
 }
 
+.btnPrimary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
 .btnOutline {
     padding: 10px 14px;
     border-radius: 10px;

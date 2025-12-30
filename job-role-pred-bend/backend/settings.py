@@ -169,3 +169,4 @@ AUTH_USER_MODEL = 'accounts.Users'
 import os
 ML_MODEL_PATH = os.path.join(BASE_DIR, "ml","saved_models","model.pkl")
 ML_ENCODER_PATH = os.path.join(BASE_DIR, "ml","saved_models","encoders.pkl")
+ML_METADATA_PATH = os.path.join(BASE_DIR, "ml","saved_models","metadata.json")
