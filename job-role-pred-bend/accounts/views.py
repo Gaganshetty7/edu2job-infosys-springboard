@@ -10,6 +10,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 from rest_framework.permissions import IsAuthenticated
 from .serializers import UserProfileSerializer
+from django.db import transaction
 
 from .models import Users, Education, Certification, PredictionHistory, AdminLogs, PlacementStatus, Skill, Project
 from .serializers import (
@@ -152,10 +153,83 @@ class ProjectViewSet(viewsets.ModelViewSet):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def my_profile(request):
-    """
-    Returns the profile of the currently logged-in user,
-    including education, certifications, and prediction history.
-    """
+    """ Returns the profile of the currently logged-in user. """
     user = request.user
     serializer = UserProfileSerializer(user)
     return Response(serializer.data)
+
+
+# -------------------------------
+# Update Logged-in User Profile
+# -------------------------------
+
+@api_view(["PUT"])
+@permission_classes([IsAuthenticated])
+def update_profile(request):
+    user = request.user
+    data = request.data
+
+    try:
+        with transaction.atomic():
+            
+            # update basic user info
+            user.name = data.get("name", user.name)
+            user.email = data.get("email", user.email)
+            user.save()
+
+            # update education
+            educations_data = data.get("educations", [])
+            # Remove all existing entries
+            Education.objects.filter(user=user).delete()
+            # Add new entries
+            for edu in educations_data:
+                Education.objects.create(
+                    user=user,
+                    degree=edu.get("degree", ""),
+                    specialization=edu.get("specialization", ""),
+                    university=edu.get("university", ""),
+                    cgpa=edu.get("cgpa") or 0.0,
+                    year_of_completion=edu.get("year_of_completion") or 0
+                )
+
+            # update certifications
+            certifications_data = data.get("certifications", [])
+            Certification.objects.filter(user=user).delete()
+            for cert in certifications_data:
+                Certification.objects.create(
+                    user=user,
+                    cert_name=cert.get("cert_name", ""),
+                    issuing_organization=cert.get("issuing_organization", ""),
+                    issue_date=cert.get("issue_date")
+                )
+
+            # update placement status
+            placement_data = data.get("placement_status")
+            if placement_data:
+                placement_obj, created = PlacementStatus.objects.get_or_create(user=user)
+                placement_obj.company = placement_data.get("company", placement_obj.company)
+                placement_obj.job_title = placement_data.get("job_title", placement_obj.job_title)
+                placement_obj.joining_date = placement_data.get("joining_date", placement_obj.joining_date)
+                placement_obj.save()
+
+            #update skills
+            skills_data = data.get("skills", [])
+            Skill.objects.filter(user=user).delete()
+            for skill in skills_data:
+                Skill.objects.create(user=user, skill_name=skill.get("skill_name", ""))
+
+            #update projects
+            projects_data = data.get("projects", [])
+            Project.objects.filter(user=user).delete()
+            for proj in projects_data:
+                Project.objects.create(
+                    user=user,
+                    title=proj.get("title", ""),
+                    description=proj.get("description", "")
+                )
+
+
+        return Response({"message": "Profile updated successfully"}, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

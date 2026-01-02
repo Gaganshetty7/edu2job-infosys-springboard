@@ -79,7 +79,7 @@ class AdminLogsSerializer(serializers.ModelSerializer):
 class PlacementStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlacementStatus
-        fields = ['company', 'job_title']
+        fields = ['company', 'job_title', 'joining_date']
 
 class SkillSerializer(serializers.ModelSerializer):
     class Meta:
@@ -98,22 +98,22 @@ class ProjectSerializer(serializers.ModelSerializer):
 class EducationNestedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Education
-        fields = ['degree', 'specialization', 'university', 'cgpa', 'year_of_completion']
+        fields = ['id','degree', 'specialization', 'university', 'cgpa', 'year_of_completion']
 
 class CertificationNestedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Certification
-        fields = ['cert_name', 'issuing_organization', 'issue_date']
+        fields = ['id','cert_name', 'issuing_organization', 'issue_date']
 
 class PredictionHistoryNestedSerializer(serializers.ModelSerializer):
     class Meta:
         model = PredictionHistory
-        fields = ['predicted_roles', 'confidence_scores', 'timestamp']
+        fields = ['id','predicted_roles', 'confidence_scores', 'timestamp']
 
 class PlacementStatusNestedSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlacementStatus
-        fields = ['company', 'job_title']
+        fields = ['company', 'job_title', 'joining_date']
 
 class SkillNestedSerializer(serializers.ModelSerializer):
     class Meta:
