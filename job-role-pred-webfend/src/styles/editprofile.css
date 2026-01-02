@@ -19,6 +19,12 @@
     box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
 }
 
+.edit-container-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 /* Titles */
 .edit-title {
     font-size: 22px;
@@ -88,7 +94,7 @@
     gap: 0px 18px;
     margin-bottom: 20px;
     padding: 12px;
-    border-radius: 20px;
+    border-radius: 12px;
     background-color: #efefef;
 }
 
@@ -118,6 +124,19 @@
 .RemoveLink.disabled {
     opacity: 0;
     pointer-events: none;
+}
+
+/* Back button */
+.back-button {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: none;
+    font-size: 12px;
+    background: #1e4fa3;
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
 }
 
 /* Save button */

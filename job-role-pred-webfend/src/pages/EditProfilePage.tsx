@@ -4,9 +4,11 @@ import { useAuth } from "../auth/AuthContext";
 import "../styles/editprofile.css";
 import { useState, useEffect } from "react";
 import api from "../api/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 export default function EditProfilePage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const [educations, setEducations] = useState([
     { degree: "", specialization: "", university: "", cgpa: "", year: "" },
@@ -167,6 +169,7 @@ export default function EditProfilePage() {
 
       if (res.status === 200) {
         alert("Profile updated successfully!");
+        navigate(-1);
       } else {
         alert("Failed to update profile. Please try again.");
       }
@@ -249,8 +252,10 @@ export default function EditProfilePage() {
 
       <main className="edit-main">
         <div className="edit-container">
-          <label className="edit-title">Edit Profile</label>
-
+          <div className="edit-container-header">
+            <label className="edit-title">Edit Profile</label>
+            <button className="back-button" onClick={() => navigate(-1)}>Back</button>
+          </div>
           <form className="edit-form" onSubmit={handleSubmit}>
             {/* BASIC INFO */}
             <div className="edit-section">

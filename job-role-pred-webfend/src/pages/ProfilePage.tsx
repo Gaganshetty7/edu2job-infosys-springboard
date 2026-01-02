@@ -19,9 +19,9 @@ interface Certification {
     id: number;
     cert_name: string;
     issuing_organization: string;
+    issue_date: string;
 }
 
-/* NEW types (all optional for now) */
 interface PlacementStatus {
     job_title: string;
     company: string;
@@ -43,8 +43,6 @@ interface UserProfile {
     role: string;
     educations: Education[];
     certifications: Certification[];
-
-    /* Optional — backend will add later */
     placement_status?: PlacementStatus | null;
     skills?: Skill[] | null;
     projects?: Project[] | null;
@@ -55,6 +53,19 @@ export default function UserProfilePage() {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const [profile, setProfile] = useState<UserProfile | null>(null);
+
+    // -----------------------------
+    // EXPAND STATE FOR CARDS
+    // -----------------------------
+    const [expanded, setExpanded] = useState({
+        education: false,
+        certifications: false,
+        skills: false,
+    });
+
+    const toggleExpand = (key: keyof typeof expanded) => {
+        setExpanded(prev => ({ ...prev, [key]: !prev[key] }));
+    };
 
     useEffect(() => {
         if (!accessToken) return;
@@ -83,6 +94,7 @@ export default function UserProfilePage() {
             <main className="main profile-main">
                 <div className="container profile-container">
 
+                    {/* Banner */}
                     <div className="ProfileBanner">
                         <div className="ProfileBannerInner">
                             <img src="/profile.jpg" className="ProfilePhoto" />
@@ -110,6 +122,7 @@ export default function UserProfilePage() {
                         </div>
                     </div>
 
+                    {/* GRID */}
                     <div className="OverviewGrid">
 
                         {/* Academic */}
@@ -121,7 +134,10 @@ export default function UserProfilePage() {
                                     <p className="SubInfo">No academic records yet</p>
                                 )}
 
-                                {profile.educations.map((edu) => (
+                                {(expanded.education
+                                    ? profile.educations
+                                    : profile.educations.slice(0, 1)
+                                ).map((edu) => (
                                     <div key={edu.id}>
                                         <p className="MainInfo">{edu.university}</p>
                                         <p className="SubInfo">
@@ -132,7 +148,14 @@ export default function UserProfilePage() {
                                 ))}
                             </div>
 
-                            <span className="SeeMoreLink">See More</span>
+                            {profile.educations.length > 1 && (
+                                <span
+                                    className="SeeMoreLink"
+                                    onClick={() => toggleExpand("education")}
+                                >
+                                    {expanded.education ? "See Less" : "See More"}
+                                </span>
+                            )}
                         </div>
 
                         {/* Certifications */}
@@ -144,15 +167,26 @@ export default function UserProfilePage() {
                                     <p className="SubInfo">No certifications yet</p>
                                 )}
 
-                                {profile.certifications.map((cert) => (
+                                {(expanded.certifications
+                                    ? profile.certifications
+                                    : profile.certifications.slice(0, 1)
+                                ).map((cert) => (
                                     <div key={cert.id}>
                                         <p className="MainInfo">{cert.cert_name}</p>
                                         <p className="SubInfo">{cert.issuing_organization}</p>
+                                        <p className="HighlightText">Issue Date: {cert.issue_date}</p>
                                     </div>
                                 ))}
                             </div>
 
-                            <span className="SeeMoreLink">See More</span>
+                            {profile.certifications.length > 1 && (
+                                <span
+                                    className="SeeMoreLink"
+                                    onClick={() => toggleExpand("certifications")}
+                                >
+                                    {expanded.certifications ? "See Less" : "See More"}
+                                </span>
+                            )}
                         </div>
 
                         {/* Placement */}
@@ -164,13 +198,15 @@ export default function UserProfilePage() {
                                     <p className="SubInfo">No placement status added yet</p>
                                 ) : (
                                     <>
-                                        <p className="MainInfo">{profile.placement_status.job_title}</p>
-                                        <p className="SubInfo">{profile.placement_status.company}</p>
+                                        <p className="MainInfo">
+                                            {profile.placement_status.job_title}
+                                        </p>
+                                        <p className="SubInfo">
+                                            {profile.placement_status.company}
+                                        </p>
                                     </>
                                 )}
                             </div>
-
-                            <span className="SeeMoreLink">See More</span>
                         </div>
 
                         {/* Skills */}
@@ -181,22 +217,27 @@ export default function UserProfilePage() {
                                 {!profile.skills || profile.skills.length === 0 ? (
                                     <p className="SubInfo">No skills added yet</p>
                                 ) : (
-                                    <div className="SkillsList">
-                                        {profile.skills.map((skill, index) => (
-                                            <span key={index} className="SkillTag">
-                                                {skill.skill_name} {/* <-- Corrected */}
-                                            </span>
+                                    <div className={`SkillsList ${expanded.skills ? "expanded" : ""}`}>
+                                        {(expanded.skills ? profile.skills : profile.skills.slice(0, 6)).map((skill, index) => (
+                                            <span key={index} className="SkillTag">{skill.skill_name}</span>
                                         ))}
                                     </div>
                                 )}
                             </div>
 
-                            <span className="SeeMoreLink">See More</span>
+                            {profile.skills && profile.skills.length > 6 && (
+                                <span
+                                    className="SeeMoreLink"
+                                    onClick={() => toggleExpand("skills")}
+                                >
+                                    {expanded.skills ? "See Less" : "See More"}
+                                </span>
+                            )}
                         </div>
 
                     </div>
 
-                    {/* Projects */}
+                    {/* Projects — ALWAYS SHOW ALL */}
                     <div className="ProjectsSection">
                         <p className="CardTitle">Projects</p>
 
