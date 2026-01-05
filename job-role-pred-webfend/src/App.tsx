@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import Dashboard, { exampleData } from "./pages/DashboardPage";
+import Dashboard from "./pages/DashboardPage";
 import ProfilePage from "./pages/ProfilePage";
 import PredictionPage from "./pages/PredictionPage";
 import EditProfilePage from "./pages/EditProfilePage";
@@ -47,7 +47,7 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <Dashboard {...exampleData} />
+              <Dashboard />
             </ProtectedRoute>
           }
         />

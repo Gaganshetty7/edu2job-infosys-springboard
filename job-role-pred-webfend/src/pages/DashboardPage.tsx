@@ -1,35 +1,167 @@
-// Dashboard.tsx
+import { useState, useEffect, useMemo } from "react";
 import NavBar from "../components/NavBar";
-import { useAuth } from "../auth/AuthContext";
 import Footer from "../components/Footer";
-// import { useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 
-type Skill = { name: string; score: number }; // 0-100
-type Role = { name: string; confidence: number };
-
-export type DashboardProps = {
-  userName: string;
-  topRole: Role;
-  avgConfidence: number; // 0-100
-  totalPredictions: number;
-  skills: Skill[]; // ordered or not
-  recommendedRoles: Role[]; // top 3-5
-  onViewRoadmap?: () => void;
+type RolePred = {
+  role: string;
+  confidence: number;
+  reasons: string[];
 };
 
-export default function Dashboard({
-  //userName,
-  topRole,
-  avgConfidence,
-  totalPredictions,
-  skills,
-  recommendedRoles,
-  onViewRoadmap,
-}: DashboardProps) {
+export default function DashboardPage() {
+  const [user, setUser] = useState({ name: "User" });
+  const [predictions, setPredictions] = useState<RolePred[]>([]);
+  const [userData, setUserData] = useState({
+    degree: "",
+    skills: [] as string[],
+    experience_level: ""
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [noData, setNoData] = useState(false);
 
-  const { user } = useAuth();
-  // const navigate = useNavigate();
+  // SAFE title-case function
+  const toTitleCase = (str?: string) => {
+    if (!str) return "";
+    return str
+      .replace(/([a-z])([A-Z])/g, "$1 $2")
+      .replace(/_/g, " ")
+      .split(" ")
+      .map(
+        word =>
+          word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      )
+      .join(" ");
+  };
+
+  useEffect(() => {
+    const fetchAllData = async () => {
+      try {
+        const token = localStorage.getItem("access");
+        if (!token) {
+          setError("Please login");
+          setLoading(false);
+          return;
+        }
+
+        const API = import.meta.env.VITE_API_BASE;
+
+        // PROFILE
+        const profileRes = await fetch(`${API}/api/accounts/myprofile/`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const profileData = await profileRes.json();
+        setUser({ name: profileData?.name || "User" });
+
+        // USER ML DATA
+        const dataRes = await fetch(`${API}/api/ml/dash-prediction-data/`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await dataRes.json();
+        setUserData(data);
+
+        // ---- GUARD: stop if no data ----
+        if (
+          !data?.degree ||
+          !data?.experience_level ||
+          !Array.isArray(data?.skills) ||
+          data.skills.length === 0
+        ) {
+          setNoData(true);
+          return;
+        }
+
+        // PREDICT (only if data exists)
+        const predictRes = await fetch(`${API}/api/ml/predict/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            skills: data.skills, // keep as array
+            qualification: data.degree,
+            experience_level: data.experience_level
+          })
+        });
+
+        const predData = await predictRes.json();
+
+        const results = predData?.predicted_role || [];
+
+        const formatted = results.map((item: any) => ({
+          role: item.role,
+          confidence: Number(item.confidence),
+          reasons: Array.isArray(item.reasons) ? item.reasons : []
+        }));
+
+        setPredictions(formatted);
+      } catch (err: any) {
+        setError(err?.message || "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllData();
+  }, []);
+
+  // ---- UI computed values ----
+  const topRole =
+    predictions[0] || {
+      role: "Analyzing...",
+      confidence: 0,
+      reasons: []
+    };
+
+  const recommendedRoles = predictions.map(p => ({
+    name: p.role,
+    confidence: p.confidence
+  }));
+
+  const topSkills = useMemo(() => {
+    const skillMatch = topRole.reasons.find(r =>
+      r.includes("skill")
+    ) || "";
+    const matchCount = skillMatch.match(/(\d+) relevant skill/);
+    return userData.skills.slice(
+      0,
+      matchCount ? parseInt(matchCount[1]) : 3
+    );
+  }, [topRole.reasons, userData.skills]);
+
+  const academicBackground = topRole.reasons.find(r =>
+    r.includes("educational") || r.includes("degree")
+  )
+    ? "Yes"
+    : "Partial";
+
+  // ---- LOADING ----
+  if (loading) {
+    return (
+      <div className="root">
+        <NavBar />
+        <div className="dashRoot">
+          <div className="header">
+            <div className="welcome">
+              <div className="wHi">Welcome back,</div>
+              <div className="name">User</div>
+            </div>
+          </div>
+
+          <div className="mainGrid">
+            <div className="rolesCard">
+              <div className="cardTitle">
+                Analyzing your profile...
+              </div>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="root">
@@ -41,108 +173,96 @@ export default function Dashboard({
             <div className="name">{user?.name}</div>
           </div>
 
-          <div className="topRow">
-            <div className="predictedRoleCard">
-              <div className="label">Top prediction</div>
-              <div className="roleWrap">
-                <div className="roleName">{topRole.name}</div>
-                <div className="roleConf">{Math.round(topRole.confidence)}%</div>
-              </div>
-              <div className="explain">Based on your skills & activity</div>
+          {error ? (
+            <div className="errorBanner">
+              <span>{error}</span>
               <button
-                className="btn"
-                onClick={() => (onViewRoadmap ? onViewRoadmap() : null)}
-                aria-label="View career roadmap"
+                className="retryBtn"
+                onClick={() => window.location.reload()}
               >
-                View roadmap
+                Retry
               </button>
             </div>
+          ) : noData ? (
+            <div className="errorBanner">
+              <span>
+                Complete your profile (degree, skills, experience)
+                to see role predictions.
+              </span>
+            </div>
+          ) : (
+            <div className="topRow">
+              <div className="predictedRoleCard">
+                <div className="label">Top prediction</div>
 
-            <div className="confidenceCard">
-              <div className="cLabel">Avg confidence</div>
-              <div className="cValue">{Math.round(avgConfidence)}%</div>
-              <div className="meta">from {totalPredictions} predictions</div>
-              <div className="meter" aria-hidden>
-                <div
-                  className="meterFill"
-                  style={{ width: `${Math.max(0, Math.min(100, avgConfidence))}%` }}
-                />
+                <div className="roleWrap">
+                  <div className="roleName">
+                    {toTitleCase(topRole.role)}
+                  </div>
+                  <div className="roleConf">
+                    {Math.round(topRole.confidence)}%
+                  </div>
+                </div>
+
+                <div className="explain">
+                  <div className="bullet">
+                    <strong>{topSkills.length} skills matched</strong>
+                  </div>
+
+                  <div className="bullet">
+                    <strong>Educational background matched:</strong>{" "}
+                    {academicBackground}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {!noData && (
+          <div className="mainGrid">
+            <div className="rolesCard">
+              <div className="cardTitle">
+                Recommended roles
+              </div>
+
+              <div className="rolesList">
+                {recommendedRoles.map((r, i) => (
+                  <div className="roleRow" key={r.name}>
+                    <div className="rank">{i + 1}</div>
+
+                    <div className="roleInfo">
+                      <div className="rName">
+                        {toTitleCase(r.name)}
+                      </div>
+                    </div>
+
+                    <div className="rBarWrap" aria-hidden>
+                      <div className="rBar">
+                        <div
+                          className="rFill"
+                          style={{
+                            width: `${Math.max(
+                              0,
+                              Math.min(100, r.confidence)
+                            )}%`
+                          }}
+                        />
+                      </div>
+
+                      <div className="rPercent">
+                        {Math.round(r.confidence)}%
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="mainGrid">
-          <div className="skillsCard">
-            <div className="cardTitle">Skill match</div>
-            <div className="skillsList">
-              {skills.map((s) => (
-                <div className="skillRow" key={s.name}>
-                  <div className="skillName">{s.name}</div>
-                  <div className="skillBar" aria-hidden>
-                    <div
-                      className="skillFill"
-                      style={{ width: `${Math.max(0, Math.min(100, s.score))}%` }}
-                    />
-                  </div>
-                  <div className="skillPct">{Math.round(s.score)}%</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rolesCard">
-            <div className="cardTitle">Recommended roles</div>
-            <div className="rolesList">
-              {recommendedRoles.map((r, i) => (
-                <div className="roleRow" key={r.name}>
-                  <div className="rank">{i + 1}</div>
-                  <div className="roleInfo">
-                    <div className="rName">{r.name}</div>
-                    <div className="rMeta">Confidence {Math.round(r.confidence)}%</div>
-                  </div>
-                  <div className="rBarWrap" aria-hidden>
-                    <div className="rBar">
-                      <div
-                        className="rFill"
-                        style={{ width: `${Math.max(0, Math.min(100, r.confidence))}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-        </div>
+        )}
       </div>
+
       <Footer />
     </div>
   );
 }
-
-/* -------------------------
-  Example usage (copy into a page)
-   ------------------------- */
-// Example data - replace with real API data
-export const exampleData: DashboardProps = {
-  userName: "Suryansh",
-  topRole: { name: "Data Scientist", confidence: 76 },
-  avgConfidence: 92,
-  totalPredictions: 3,
-  skills: [
-    { name: "Problem Solving", score: 82 },
-    { name: "Programming", score: 76 },
-    { name: "Data Analysis", score: 68 },
-    { name: "Communication", score: 70 },
-  ],
-  recommendedRoles: [
-    { name: "Data Scientist", confidence: 78 },
-    { name: "ML Engineer", confidence: 75 },
-    { name: "Full Stack Developer", confidence: 72 },
-  ],
-  onViewRoadmap: () => {
-    // navigate or open roadmap modal
-    console.log("Open roadmap");
-  },
-};

@@ -19,16 +19,18 @@
   background: var(--bg);
   display: flex;
   justify-content: center;
+  flex-direction: column;
 }
 
 /* root container */
 .dashRoot {
+  flex: 1;
   width: 100%;
-  max-width: 1200px;
+  max-width: 900px;
   margin: 10px auto;
   display: flex;
   flex-direction: column;
-  gap: var(--gap);
+  gap: 35px;;
   margin-bottom: 14px;
 }
 
@@ -53,24 +55,24 @@
   color: var(--accent);
 }
 
-/* top row */
+/* top row - now single column full width */
 .topRow {
   display: flex;
+  flex-direction: column;
   gap: 16px;
-  align-items: stretch;
   width: 100%;
 }
 
-/* Predicted role card */
+/* Predicted role card - now full width */
 .predictedRoleCard {
-  flex: 1.4;
+  width: 100%;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(250, 250, 252, 0.95));
   border-radius: var(--radius);
-  padding: 18px;
+  padding: 24px;
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 7px;
 }
 
 .label {
@@ -86,160 +88,79 @@
 }
 
 .roleName {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
 }
 
 .roleConf {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--accent);
 }
 
 .explain {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--muted);
+  line-height: 1.6;
 }
 
-/* button */
-.btn {
-  margin-top: auto;
-  align-self: flex-start;
-  background: var(--accent);
-  color: white;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 10px;
-  cursor: pointer;
+.reasoningTitle {
   font-weight: 600;
-  box-shadow: 0 6px 14px rgba(10, 132, 255, 0.18);
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 15px;
 }
 
-.btn:active {
-  transform: translateY(1px);
-}
-
-/* confidence card */
-.confidenceCard {
-  flex: 0.7;
-  background: var(--card);
-  border-radius: var(--radius);
-  padding: 14px;
-  box-shadow: var(--shadow);
+.reasoningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  align-items: flex-start;
 }
 
-.cLabel {
-  font-size: 22px;
-  color: var(--accent);
-  font-weight: 700;
+.reasoningList li {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.5;
 }
 
-.cValue {
-  font-size: 28px;
-  margin-top: 10px;
-  font-weight: 700;
-  color: #111;
+.reasonLabel {
+  font-weight: 600;
+  color: #333;
 }
 
-.meta {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-/* meter */
-.meter {
-  width: 100%;
-  height: 10px;
-  background: linear-gradient(90deg, #f1f3f5, #eef1f6);
-  border-radius: 999px;
-  margin-top: 6px;
-  overflow: hidden;
-}
-
-.meterFill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent), #1e4fa3);
-  border-radius: 999px 0 0 999px;
-  transition: width .6s ease;
-}
-
-/* main grid */
+/* main grid - now single column */
 .mainGrid {
   margin-top: 7px;
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* always 2 columns */
+  display: flex;
+  flex-direction: column;
   gap: 16px;
-  align-items: stretch;
 }
 
-/* skills card */
-.skillsCard,
+/* roles card - now full width */
 .rolesCard {
+  width: 100%;
   display: flex;
   flex-direction: column;
   background: var(--card);
   border-radius: var(--radius);
-  padding: 16px;
+  padding: 20px;
   box-shadow: var(--shadow);
 }
 
-/* skills card */
 .cardTitle {
   font-weight: 700;
   font-size: 22px;
   color: var(--accent);
 }
 
-.skillsList {
-  display: flex;
-  margin-top: 20px;
-  flex-direction: column;
-  gap: 15px;
-}
-
-/* skill row */
-.skillRow {
-  display: grid;
-  grid-template-columns: 1fr 160px 48px;
-  gap: 12px;
-  align-items: center;
-}
-
-.skillName {
-  font-weight: 600;
-  font-size: 14px;
-  color: #222;
-}
-
-.skillBar {
-  height: 10px;
-  background: #f1f3f5;
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.skillFill {
-  height: 100%;
-  background: linear-gradient(90deg, #00c6ff, #1e4fa3);
-  transition: width .6s ease;
-}
-
-.skillPct {
-  font-weight: 600;
-  text-align: right;
-  color: var(--muted);
-}
-
-/* roles card */
 .rolesList {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 6px;
+  gap: 14px;
+  margin-top: 16px;
 }
 
 .roleRow {
@@ -258,6 +179,7 @@
   background: linear-gradient(180deg, #f6f9ff, #eef7ff);
   font-weight: 700;
   color: var(--accent);
+  flex-shrink: 0;
 }
 
 .roleInfo {
@@ -266,19 +188,16 @@
 
 .rName {
   font-weight: 700;
-}
-
-.rMeta {
-  font-size: 12px;
-  color: var(--muted);
+  font-size: 15px;
 }
 
 .rBarWrap {
-  width: 120px;
+  width: 180px;
+  flex-shrink: 0;
 }
 
 .rBar {
-  height: 8px;
+  height: 12px;
   background: #f1f3f5;
   border-radius: 999px;
   overflow: hidden;
@@ -290,67 +209,37 @@
   transition: width .6s ease;
 }
 
-/* history card */
-.historyCard {
-  grid-column: 1 / 3;
-  background: var(--card);
-  border-radius: var(--radius);
-  padding: 14px;
-  box-shadow: var(--shadow);
-  margin-top: 6px;
-}
-
-.historyList {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 8px;
-}
-
-.histRow {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.hTime {
-  color: var(--muted);
-  font-size: 13px;
-  min-width: 110px;
-}
-
-.hRole {
-  font-weight: 600;
-  flex: 1;
-}
-
-.hConf {
-  font-weight: 700;
-  color: var(--accent);
-  min-width: 56px;
-  text-align: right;
-}
-
 /* responsive */
-@media (max-width:900px) {
-  .mainGrid {
-    grid-template-columns: 1fr; /* single column on small screens */
-  }
-
-  .historyCard {
-    grid-column: 1;
-  }
-
-  .topRow {
-    flex-direction: column;
-  }
-
+@media (max-width: 768px) {
   .predictedRoleCard {
-    order: 0;
+    padding: 18px;
   }
 
-  .confidenceCard {
-    order: 1;
+  .roleName {
+    font-size: 20px;
+  }
+
+  .roleConf {
+    font-size: 18px;
+  }
+
+  .explain {
+    font-size: 13px;
+  }
+
+  .reasoningTitle {
+    font-size: 14px;
+  }
+
+  .rBarWrap {
+    width: 120px;
+  }
+
+  .rBar {
+    height: 10px;
+  }
+
+  .roleRow {
+    gap: 10px;
   }
 }

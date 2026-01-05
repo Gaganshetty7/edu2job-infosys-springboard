@@ -7,6 +7,7 @@ from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
 import os
 import json
+from accounts.models import Education, Skill
 
 from .train import train_model
 from .predict import predict_job_role
@@ -41,7 +42,8 @@ def predict_view(request):
     return Response({"predicted_role": job})
 
 
-# 
+# -----------------------------
+# Metadata View (Public)
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def metadata_view(request):
@@ -54,3 +56,26 @@ def metadata_view(request):
         data = json.load(f)
 
     return Response(data)
+
+# -----------------------------
+# Dashboard prediction Data View (Authenticated)
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def dash_prediction_data(request):
+    # Degree
+    edu = Education.objects.filter(user=request.user).first()
+    degree = edu.degree if edu else None
+
+    # Skills
+    skills = Skill.objects.filter(user=request.user)
+    skill_list = [s.skill_name for s in skills]
+
+    # Hard-coded
+    experience = "entry"
+
+    return Response({
+        "degree": degree,
+        "skills": skill_list,
+        "experience_level": experience
+    })
