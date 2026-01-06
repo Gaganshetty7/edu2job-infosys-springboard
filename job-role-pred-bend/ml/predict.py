@@ -1,7 +1,9 @@
 import os
 import pickle
+import numpy as np
 import pandas as pd
 from django.conf import settings
+
 
 MODEL_PATH = settings.ML_MODEL_PATH
 
@@ -38,11 +40,19 @@ def predict_job_role(skills, qualification, experience_level):
     qualification = qualification.strip().lower()
     experience_level = experience_level.strip().lower()
 
-    incoming_skills = [
-        s.strip().lower()
-        for s in skills.split(",")
-        if s.strip()
-    ]
+    # skills can be a list (from dash_prediction_data) or a comma-separated string (from JSON)
+    if isinstance(skills, list):
+        incoming_skills = [
+            s.strip().lower()
+            for s in skills
+            if isinstance(s, str) and s.strip()
+        ]
+    else:
+        incoming_skills = [
+            s.strip().lower()
+            for s in str(skills).split(",")
+            if s.strip()
+        ]
 
     # ---------- BASE FEATURE DICT ----------
     data = {col: 0 for col in feature_cols}
@@ -62,34 +72,88 @@ def predict_job_role(skills, qualification, experience_level):
     # ---------- PREDICT ----------
     probs = model.predict_proba(df)[0]
 
+    # ---------- SHAP VALUES ----------
+    explainer = artifacts["explainer"]
+    shap_values = explainer.shap_values(df)
+
     # top‑3 indices (highest probability first)
     top3_idx = probs.argsort()[-3:][::-1]
     job_labels = enc["job_role"].inverse_transform(top3_idx)
 
+    # ----------- BUILD REASONS (for roleCard) -----------
     results = []
 
     for i, idx in enumerate(top3_idx):
         role_name = job_labels[i]
         prob = float(probs[idx])
 
-        # ----------- BUILD REASONS (for roleCard) -----------
-        reasons = []
+        # ---------- SHAP CONTRIBUTIONS FOR THIS ROLE ----------
+        # shap_values can be:
+        # - list of arrays (one per class)
+        # - single array (n_samples, n_features)
+        # - array (n_samples, n_features, n_classes)
+        if isinstance(shap_values, list):
+            # list: one array per class
+            class_shap = shap_values[idx]      # shape (1, n_features)
+            contribs = class_shap[0]
+        else:
+            sv = np.array(shap_values)
+            if sv.ndim == 2:
+                # (1, n_features) – same SHAP vector for all roles
+                contribs = sv[0]
+            elif sv.ndim == 3:
+                # (1, n_features, n_classes) – pick this class
+                contribs = sv[0, :, idx]
+            else:
+                raise ValueError(f"Unexpected shap_values shape: {sv.shape}")
 
-        # degree heuristic
-        if any(x in qualification for x in ["bsc", "b.tech", "msc", "mca", "phd"]):
-            reasons.append("Relevant educational background")
+        feature_importance = list(zip(feature_cols, contribs))
 
-        # skill matches that help
-        matched = [
-            sk
-            for sk in incoming_skills
-            if f"skill__{sk}" in vocab
-        ]
-        if matched:
-            reasons.append(f"{len(matched)} relevant skill(s) detected")
+        # Sort by strongest positive influence
+        feature_importance.sort(key=lambda x: abs(x[1]), reverse=True)
 
-        if not reasons:
-            reasons.append("Based on overall probability pattern")
+        skill_reasons = []
+        edu_exp_reasons = []
+
+        # only allow reasons for skills actually present in input
+        input_skill_cols = {f"skill__{s}" for s in incoming_skills}
+
+        for feat, value in feature_importance[:15]:   # look at top influences
+            # skills: only consider input skills
+            if feat.startswith("skill__") and value > 0 and feat in input_skill_cols:
+                skill_name = feat.replace("skill__", "")
+                skill_reasons.append(f"{skill_name} aligned strongly with {role_name}")
+
+            # qualification
+            elif feat == "qualification" and value > 0:
+                decoded = enc["qualification"].inverse_transform(
+                    [int(df.iloc[0][feat])]
+                )[0]
+                edu_exp_reasons.append(
+                    f"Profiles with '{decoded}' frequently match {role_name}"
+                )
+
+            # experience
+            elif feat == "experience_level" and value > 0:
+                decoded = enc["experience_level"].inverse_transform(
+                    [int(df.iloc[0][feat])]
+                )[0]
+                edu_exp_reasons.append(
+                    f"Experience level '{decoded}' is common among {role_name}s"
+                )
+
+            # stop once we have enough explanations
+            if len(skill_reasons) >= 3 and len(edu_exp_reasons) >= 2:
+                break
+
+        # fallbacks if nothing positive appeared
+        if not skill_reasons:
+            skill_reasons.append("No direct skill signals — inferred from broader pattern")
+
+        if not edu_exp_reasons:
+            edu_exp_reasons.append("Education/experience pattern inferred from model")
+
+        reasons = skill_reasons + edu_exp_reasons
 
         results.append(
             {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import "../styles/dashboard.css";
@@ -60,6 +60,7 @@ export default function DashboardPage() {
         });
         const data = await dataRes.json();
         setUserData(data);
+        console.log("User data:", userData);
 
         // ---- GUARD: stop if no data ----
         if (
@@ -119,23 +120,6 @@ export default function DashboardPage() {
     name: p.role,
     confidence: p.confidence
   }));
-
-  const topSkills = useMemo(() => {
-    const skillMatch = topRole.reasons.find(r =>
-      r.includes("skill")
-    ) || "";
-    const matchCount = skillMatch.match(/(\d+) relevant skill/);
-    return userData.skills.slice(
-      0,
-      matchCount ? parseInt(matchCount[1]) : 3
-    );
-  }, [topRole.reasons, userData.skills]);
-
-  const academicBackground = topRole.reasons.find(r =>
-    r.includes("educational") || r.includes("degree")
-  )
-    ? "Yes"
-    : "Partial";
 
   // ---- LOADING ----
   if (loading) {
@@ -205,15 +189,13 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="explain">
-                  <div className="bullet">
-                    <strong>{topSkills.length} skills matched</strong>
-                  </div>
-
-                  <div className="bullet">
-                    <strong>Educational background matched:</strong>{" "}
-                    {academicBackground}
-                  </div>
+                  {topRole.reasons.map((reason, i) => (
+                    <div className="bullet" key={i}>
+                      {reason}
+                    </div>
+                  ))}
                 </div>
+
               </div>
             </div>
           )}

@@ -2,6 +2,7 @@ import os
 import json
 import pandas as pd
 import pickle
+import shap
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
@@ -83,11 +84,16 @@ def train_model(dataset_path):
     model = RandomForestClassifier(n_estimators=150, random_state=42)
     model.fit(X_train, y_train)
 
+    # SHAP explainer for interpretability
+    explainer = shap.TreeExplainer(model)
+
+
     # save model + encoders
     artifacts = {
         "model": model,
         "feature_cols": feature_cols,
         "skill_vocab": skill_vocab,
+        "explainer": explainer,
         "encoders": {
             "qualification": le_qualification,
             "experience_level": le_experience,
