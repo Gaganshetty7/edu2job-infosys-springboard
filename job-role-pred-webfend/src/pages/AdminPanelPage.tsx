@@ -1,6 +1,6 @@
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../auth/AuthContext";
 import "../styles/admin.css";
 
@@ -8,6 +8,17 @@ export default function AdminPanelPage() {
   const { user } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<string>("");
+  const [stats, setStats] = useState({
+    total_users: 0,
+    predictions: 0,
+    approved_roles: 0,
+    flagged_predictions: 0,
+    model_accuracy: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [loadingRecent, setLoadingRecent] = useState(true);
+
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) setFile(e.target.files[0]);
@@ -40,6 +51,33 @@ export default function AdminPanelPage() {
     }
   };
 
+  useEffect(() => {
+    const API = import.meta.env.VITE_API_BASE;
+    const token = localStorage.getItem('access');
+
+    // Fetch BOTH at same time
+    Promise.all([
+      fetch(`${API}/api/ml/admin/stats/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).then(res => res.json()),
+
+      fetch(`${API}/api/ml/admin/recent/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).then(res => res.json())
+    ])
+      .then(([statsData, recentData]) => {
+        setStats(statsData);
+        setRecentActivity(recentData);
+      })
+      .catch(err => console.error(err))
+      .finally(() => {
+        setLoading(false);
+        setLoadingRecent(false);
+      });
+  }, []);
+
+
+
   return (
     <div className="root">
       <NavBar />
@@ -57,27 +95,26 @@ export default function AdminPanelPage() {
         <section className="adminStats">
           <div className="aCard">
             <div className="aLabel">Total Users</div>
-            <div className="aValue">1,248</div>
+            <div className="aValue">{loading ? '...' : stats.total_users}</div>
             <div className="aHint">active on platform</div>
           </div>
 
           <div className="aCard">
             <div className="aLabel">Predictions</div>
-            <div className="aValue">6,732</div>
+            <div className="aValue">{loading ? '...' : stats.predictions}</div>
             <div className="aHint">model usage count</div>
           </div>
 
           <div className="aCard">
             <div className="aLabel">Approved Roles</div>
-            <div className="aValue">312</div>
-            <div className="aHint">visible to users</div>
+            <div className="aValue">{loading ? '...' : stats.approved_roles}</div>
           </div>
 
           <div className="aCard">
             <div className="aLabel">Model Accuracy</div>
-            <div className="aValue">87%</div>
+            <div className="aValue">{loading ? '...' : Math.round(stats.model_accuracy * 100)}%</div>
             <div className="meter">
-              <div className="meterFill" style={{ width: "87%" }} />
+              <div className="meterFill" style={{ width: `${stats.model_accuracy * 100}%` }} />
             </div>
           </div>
         </section>
@@ -88,31 +125,27 @@ export default function AdminPanelPage() {
           <table>
             <thead>
               <tr>
-                <th>User</th>
-                <th>Qualification</th>
-                <th>Skills</th>
+                <th>User ID</th>
                 <th>Predicted Role</th>
+                <th>Confidence Score</th>
+                <th>Status</th>
                 <th>Date</th>
               </tr>
             </thead>
 
             <tbody>
-              <tr>
-                <td>Arjun</td>
-                <td>BTech</td>
-                <td>React, Node</td>
-                <td>Frontend Developer</td>
-                <td>Today</td>
-              </tr>
-
-              <tr>
-                <td>Sneha</td>
-                <td>MCA</td>
-                <td>Python, ML</td>
-                <td>Data Analyst</td>
-                <td>Yesterday</td>
-              </tr>
+              {recentActivity.map((activity: any) => (
+                <tr key={activity.id}>
+                  <td>{activity.user_id}</td>
+                  <td>{activity.predicted_role}</td>
+                  <td>{activity.confidence}</td>
+                  <td>{activity.status}</td>
+                  <td>{activity.timestamp}</td>
+                </tr>
+              ))}
+              {loadingRecent && <tr><td colSpan={5}>Loading...</td></tr>}
             </tbody>
+
           </table>
         </section>
 

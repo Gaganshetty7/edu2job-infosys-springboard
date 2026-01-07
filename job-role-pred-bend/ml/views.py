@@ -5,6 +5,10 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
+from .models import Prediction 
+from django.utils import timezone
+from django.contrib.auth import get_user_model
+
 import os
 import json
 from accounts.models import Education, Skill
@@ -39,6 +43,19 @@ def predict_view(request):
         return Response({"error": "Missing fields"}, status=400)
 
     job = predict_job_role(skills, qualification, experience)
+     
+    # Get prediction result
+    predicted_role = str(job[0])[:250]
+    confidence = float(job[1]['confidence'])
+
+    Prediction.objects.create(
+        predicted_roles=predicted_role,
+        confidence_scores=confidence,
+        timestamp=timezone.now(),
+        user_id=request.user.id
+    )
+
+    
     return Response({"predicted_role": job})
 
 
@@ -79,3 +96,51 @@ def dash_prediction_data(request):
         "skills": skill_list,
         "experience_level": experience
     })
+
+# -----------------------------
+# Admin stats
+User = get_user_model()
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def admin_stats(request):
+    return Response({
+        'total_users': User.objects.count(),
+        'predictions': Prediction.objects.count(),
+        'approved_roles': Prediction.objects.filter(is_approved=True).count(),
+        'flagged_predictions': Prediction.objects.filter(is_flagged=True).count(),
+        'model_accuracy': 0.87
+    })
+
+# -----------------------------
+# Fetch Recent Predictions
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def recent_activity(request):
+    recent = Prediction.objects.order_by('-timestamp')[:10]
+    
+    result = []
+    for p in recent:
+        role = p.predicted_roles
+        
+        # Extract role from JSON string
+        if role.startswith('{'):
+            try:
+                import re
+                match = re.search(r"'role':\s*'([^']+)'", role)
+                role = match.group(1) if match else role[:30]
+            except:
+                role = role[:30]
+        
+        result.append({
+            'id': p.id,
+            'user_id': p.user_id,
+            'predicted_role': role,  # Clean name only
+            'confidence': float(p.confidence_scores),
+            'timestamp': p.timestamp.strftime('%b %d, %H:%M'),
+            'status': 'Approved' if (p.is_approved) else 
+                     'Flagged' if (p.is_flagged) else 'Pending',
+        })
+    
+    return Response(result)
+
+
