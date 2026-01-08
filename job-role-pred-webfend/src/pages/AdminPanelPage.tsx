@@ -32,22 +32,34 @@ export default function AdminPanelPage() {
 
     setStatus("Uploading & training…");
 
+    const API = import.meta.env.VITE_API_BASE;
+    const token = localStorage.getItem("access");
+
     const formData = new FormData();
     formData.append("dataset", file);
 
     try {
-      const res = await fetch("/api/admin/train-model/", {
+      const trainRes = await fetch(`${API}/api/ml/admin/train/`, {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: formData,
-        credentials: "include",
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed");
+      const trainData = await trainRes.json();
+      if (!trainRes.ok) throw new Error(trainData.message || "Training failed");
 
-      setStatus("Model trained & saved successfully");
+
+      //Fetch metadata immediately after
+      const metaRes = await fetch(`${API}/api/ml/metadata/`);
+      const metaData = await metaRes.json();
+      if (!metaRes.ok) throw new Error(metaData.error || "Failed to fetch metadata");
+
+      setStatus("Model trained & metadata updated successfully!");
+
     } catch (err: any) {
-      setStatus("Training failed: " + err.message);
+      setStatus("Error: " + err.message);
     }
   };
 
@@ -139,7 +151,11 @@ export default function AdminPanelPage() {
                   <td>{activity.user_id}</td>
                   <td>{activity.predicted_role}</td>
                   <td>{activity.confidence}</td>
-                  <td>{activity.status}</td>
+                  <td>
+                    <span className={`status-badge status-${activity.status.toLowerCase()}`}>
+                      {activity.status}
+                    </span>
+                  </td>
                   <td>{activity.timestamp}</td>
                 </tr>
               ))}

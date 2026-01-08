@@ -27,6 +27,9 @@ export default function PredictionPage() {
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<FullPrediction[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [predictionId, setPredictionId] = useState<number | null>(null);
+  const [feedbackStatus, setFeedbackStatus] = useState<"idle" | "approved" | "flagged">("idle");
+
 
   const [metadata, setMetadata] = useState<{
     qualification: string[];
@@ -88,6 +91,10 @@ export default function PredictionPage() {
       const data = await resp.json();
       const results = data.predicted_role || [];
 
+      // capturing prediction id for prediction approval
+      setPredictionId(data.prediction_id);
+      setFeedbackStatus("idle");
+
       const formatted: RolePred[] = results.map((item: any) => ({
         role: item.role,
         confidence: Math.round(Number(item.confidence)),
@@ -113,6 +120,38 @@ export default function PredictionPage() {
     setLoading(false);
   };
 
+
+  // prediction feedback/approval
+  const sendFeedback = async (action: "approve" | "flag") => {
+    if (!predictionId || feedbackStatus !== "idle") return;
+
+    try {
+      const token = localStorage.getItem("access");
+      const API = import.meta.env.VITE_API_BASE;
+
+      const resp = await fetch(
+        `${API}/api/ml/prediction/${predictionId}/feedback/`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ action }),
+        }
+      );
+
+      if (!resp.ok) throw new Error("Feedback failed");
+
+      // Lock UI + show thank-you
+      setFeedbackStatus(action === "approve" ? "approved" : "flagged");
+    } catch (err) {
+      console.error("Feedback error:", err);
+    }
+  };
+
+
+
   const handleReset = () => {
     setDegree("");
     setSelectedSkills([]);
@@ -132,57 +171,94 @@ export default function PredictionPage() {
       </div>
 
       <div className="page container">
-        <form className="leftBox glassBox predCard" onSubmit={handlePredict}>
-          <div className="cardTitle">Profile Summary</div>
-
-          <label className="lbl">Highest degree</label>
-          <select className="input" value={degree} onChange={(e) => setDegree(e.target.value)}>
-            <option value="" disabled>
-              Select degree
-            </option>
-            {metadata?.qualification.map((q) => (
-              <option key={q} value={q}>
-                {q}
+        <div className="leftColumn">
+          <form className="leftBox glassBox predCard" onSubmit={handlePredict}>
+            <label className="lbl">Highest degree</label>
+            <select className="input" value={degree} onChange={(e) => setDegree(e.target.value)}>
+              <option value="" disabled>
+                Select degree
               </option>
-            ))}
-          </select>
+              {metadata?.qualification.map((q) => (
+                <option key={q} value={q}>
+                  {q}
+                </option>
+              ))}
+            </select>
 
-          <label className="lbl">Skills</label>
-          <Select
-            isMulti
-            options={skillOptions}
-            value={selectedSkills}
-            onChange={(skills) => setSelectedSkills(skills as any)}
-            placeholder="Select skills"
-          />
+            <label className="lbl">Skills</label>
+            <Select
+              isMulti
+              options={skillOptions}
+              value={selectedSkills}
+              onChange={(skills) => setSelectedSkills(skills as any)}
+              placeholder="Select skills"
+            />
 
-          <label className="lbl">Experience level</label>
-          <select className="input" value={experience} onChange={(e) => setExperience(e.target.value)}>
-            <option value="" disabled>
-              Select experience level
-            </option>
-            {metadata?.experience_level.map((e) => (
-              <option key={e} value={e}>
-                {e}
+            <label className="lbl">Experience level</label>
+            <select className="input" value={experience} onChange={(e) => setExperience(e.target.value)}>
+              <option value="" disabled>
+                Select experience level
               </option>
-            ))}
-          </select>
+              {metadata?.experience_level.map((e) => (
+                <option key={e} value={e}>
+                  {e}
+                </option>
+              ))}
+            </select>
 
-          {error && <div className="errBox">{error}</div>}
+            {error && <div className="errBox">{error}</div>}
 
-          <div className="btnRow">
-            <button
-              className="btnPrimary"
-              type="submit"
-              disabled={loading || !degree || !selectedSkills.length || !experience}
-            >
-              {loading ? "Predicting..." : "Predict Now"}
-            </button>
-            <button type="button" className="btnOutline" onClick={handleReset}>
-              Reset
-            </button>
-          </div>
-        </form>
+            <div className="btnRow">
+              <button
+                className="btnPrimary"
+                type="submit"
+                disabled={loading || !degree || !selectedSkills.length || !experience}
+              >
+                {loading ? "Predicting..." : "Predict Now"}
+              </button>
+              <button type="button" className="btnOutline" onClick={handleReset}>
+                Reset
+              </button>
+            </div>
+          </form>
+
+          {preds && preds.length > 0 && predictionId && (
+            <div className="leftBox glassBox approvalCard">
+              <div className="cardTitle approvalTitle">Prediction Approval</div>
+
+              {feedbackStatus === "idle" ? (
+                <>
+                  <div className="approvalText">
+                    Is the predicted role accurate?
+                  </div>
+
+                  <div className="btnRow approvalBtns">
+                    <button
+                      type="button"
+                      className="btnPrimaryApprove"
+                      onClick={() => sendFeedback("approve")}
+                    >
+                      Yes
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btnPrimaryFlag"
+                      onClick={() => sendFeedback("flag")}
+                    >
+                      Flag
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="feedbackThanks">
+                  Thank you for the feedback!!
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
 
         <div className="rightBox">
           <div className="predHeader">Predicted Roles</div>

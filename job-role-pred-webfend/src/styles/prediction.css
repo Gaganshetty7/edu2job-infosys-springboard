@@ -22,9 +22,10 @@
 }
 
 .pgTitle {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 700;
     color: var(--accent);
+    margin-top: 60px;
 }
 
 .pgSub {
@@ -59,11 +60,20 @@
     backdrop-filter: blur(10px);
 }
 
+.approvalCard{
+    border: solid #1e4fa3 4px;
+    display: block;
+    justify-content: center;
+    align-items: center;
+}
+
 /* LEFT FORM */
+
 .leftBox {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    margin-top: 22px;
     align-self: flex-start;
 }
 
@@ -119,6 +129,23 @@
     cursor: pointer;
 }
 
+.btnPrimaryApprove{
+    background-color: rgb(55, 137, 55);
+    color: white;
+}
+
+.btnPrimaryFlag{
+    background-color: rgb(191, 39, 39);
+    color: white;
+}
+
+.feedbackThanks {
+  text-align: center;
+  font-weight: 600;
+  color: #277a29;
+}
+
+
 /* RIGHT RESULTS */
 .rightBox {
     flex: 1;
@@ -132,7 +159,7 @@
 .predWrap {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 19px;
 }
 
 .empty {

@@ -73,6 +73,18 @@ th, td {
   text-align: left;
 }
 
+.status-approved {
+  color: #2b8d3b;
+}
+
+.status-flagged {
+  color: #b72525;
+}
+
+.status-pending {
+  color: #374151;
+}
+
 tbody tr:nth-child(even) {
   background: #fafafa;
 }

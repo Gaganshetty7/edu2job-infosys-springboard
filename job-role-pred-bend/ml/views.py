@@ -27,13 +27,20 @@ def train_view(request):
     if not dataset:
         return Response({"error": "No dataset uploaded"}, status=400)
 
+    # Delete old model if exists
+    if os.path.exists(settings.ML_MODEL_PATH):
+        os.remove(settings.ML_MODEL_PATH)
+
+    if os.path.exists(settings.ML_METADATA_PATH):
+        os.remove(settings.ML_METADATA_PATH)
+
     msg = train_model(dataset)
     return Response({"message": msg})
 
 
 # --- PREDICT (PUBLIC) ---
 @api_view(["POST"])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def predict_view(request):
     skills = request.data.get("skills")
     qualification = request.data.get("qualification")
@@ -48,7 +55,7 @@ def predict_view(request):
     predicted_role = str(job[0])[:250]
     confidence = float(job[1]['confidence'])
 
-    Prediction.objects.create(
+    prediction = Prediction.objects.create(
         predicted_roles=predicted_role,
         confidence_scores=confidence,
         timestamp=timezone.now(),
@@ -56,7 +63,10 @@ def predict_view(request):
     )
 
     
-    return Response({"predicted_role": job})
+    return Response({
+        "prediction_id": prediction.id,
+        "predicted_role": job
+        })
 
 
 # -----------------------------
@@ -142,5 +152,35 @@ def recent_activity(request):
         })
     
     return Response(result)
+
+# -----------------------------
+# Update prediction feedback
+@api_view(["PATCH"])
+@permission_classes([IsAuthenticated])
+def prediction_feedback(request, pk):
+    action = request.data.get("action")
+
+    if action not in ["approve", "flag"]:
+        return Response({"error": "Invalid action"}, status=400)
+
+    try:
+        prediction = Prediction.objects.get(id=pk, user_id=request.user.id)
+    except Prediction.DoesNotExist:
+        return Response({"error": "Prediction not found"}, status=404)
+
+    # Prevent double feedback
+    if prediction.is_approved or prediction.is_flagged:
+        return Response({"error": "Feedback already submitted"}, status=400)
+
+    if action == "approve":
+        prediction.is_approved = True
+        prediction.approved_at = timezone.now()
+
+    if action == "flag":
+        prediction.is_flagged = True
+
+    prediction.save()
+
+    return Response({"status": "success"})
 
 

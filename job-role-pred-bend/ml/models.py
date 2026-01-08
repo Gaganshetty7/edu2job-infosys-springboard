@@ -10,7 +10,6 @@ class Prediction(models.Model):
     user_id = models.BigIntegerField()
     is_approved = models.BooleanField(default=False)
     is_flagged = models.BooleanField(default=False)
-    approved_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'prediction_history'
