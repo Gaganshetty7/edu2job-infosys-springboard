@@ -14,21 +14,27 @@ const NavBar = () => {
       <div style={styles.navButtonsDiv}>
         {user ? (
           <>
-            <a style={styles.navLink}
-              onClick={(e) => {
-                e.preventDefault();
-                navigate("/dashboard");
-              }}>Dashboard</a>
+            {!(user?.role === "ADMIN") && (
+              <a style={styles.navLink}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/dashboard");
+                }}>Dashboard</a>
+            )}
+
             <a style={styles.navLink}
               onClick={(e) => {
                 e.preventDefault();
                 navigate("/predict");
               }}>Predict</a>
-            <a style={styles.navLink}
-              onClick={(e) => {
-                e.preventDefault();
-                navigate("/profile");
-              }}>Profile</a>
+
+            {!(user?.role === "ADMIN") && (
+              <a style={styles.navLink}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/profile");
+                }}>Profile</a>
+            )}
 
             {user?.role === "ADMIN" && (
               <a
