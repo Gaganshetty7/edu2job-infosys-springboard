@@ -12,7 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import UserProfileSerializer
 from django.db import transaction
 
-from .models import Users, Education, Certification, PredictionHistory, AdminLogs, PlacementStatus, Skill, Project
+from .models import Users, Education, Certification, PredictionHistory, AdminLogs, PlacementStatus, Skill, Project, DashboardSnapshot
 from .serializers import (
     UserSerializer,
     EducationSerializer,
@@ -233,4 +233,58 @@ def update_profile(request):
     
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
+# -------------------------------
+# Get Dashboard Snapshot
+# -------------------------------
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_dashboard_snapshot(request):
+    try:
+        snapshot = request.user.dashboard_snapshot
+        return Response({
+            "profile_complete": snapshot.profile_complete,
+            "predictions": snapshot.predictions,
+            "updated_at": snapshot.updated_at
+        })
+    except DashboardSnapshot.DoesNotExist:
+        return Response(
+            {"profile_complete": False},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+
+# -------------------------------
+# Upsert Dashboard Snapshot
+# -------------------------------
+
+@api_view(["POST", "PUT"])
+@permission_classes([IsAuthenticated])
+def upsert_dashboard_snapshot(request):
+    user = request.user
+    data = request.data
+
+    # required fields
+    if "predictions" not in data:
+        return Response(
+            {"error": "predictions is required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    snapshot, created = DashboardSnapshot.objects.update_or_create(
+        user=user,
+        defaults={
+            "profile_complete": data.get("profile_complete", True),
+            "predictions": data["predictions"],
+        }
+    )
+
+    return Response(
+        {
+            "message": "Dashboard snapshot saved",
+            "created": created
+        },
+        status=status.HTTP_200_OK
+    )
+

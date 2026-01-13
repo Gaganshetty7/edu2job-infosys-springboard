@@ -12,11 +12,6 @@ type RolePred = {
 export default function DashboardPage() {
   const [user, setUser] = useState({ name: "User" });
   const [predictions, setPredictions] = useState<RolePred[]>([]);
-  const [userData, setUserData] = useState({
-    degree: "",
-    skills: [] as string[],
-    experience_level: ""
-  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [noData, setNoData] = useState(false);
@@ -47,55 +42,50 @@ export default function DashboardPage() {
 
         const API = import.meta.env.VITE_API_BASE;
 
-        // PROFILE
+        // PROFILE (for user name)
         const profileRes = await fetch(`${API}/api/accounts/myprofile/`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const profileData = await profileRes.json();
         setUser({ name: profileData?.name || "User" });
 
-        // USER ML DATA
-        const dataRes = await fetch(`${API}/api/ml/dash-prediction-data/`, {
+        // DASHBOARD SNAPSHOT
+        const snapshotRes = await fetch(`${API}/api/accounts/dashboard-snapshot/`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        const data = await dataRes.json();
-        setUserData(data);
-        console.log("User data:", userData);
 
-        // ---- GUARD: stop if no data ----
-        if (
-          !data?.degree ||
-          !data?.experience_level ||
-          !Array.isArray(data?.skills) ||
-          data.skills.length === 0
-        ) {
+        if (snapshotRes.status === 404) {
+          // No snapshot exists - profile not complete
           setNoData(true);
+          setLoading(false);
           return;
         }
 
-        // PREDICT (only if data exists)
-        const predictRes = await fetch(`${API}/api/ml/predict/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            skills: data.skills, // keep as array
-            qualification: data.degree,
-            experience_level: data.experience_level
-          })
-        });
+        if (!snapshotRes.ok) {
+          throw new Error("Failed to fetch dashboard snapshot");
+        }
 
-        const predData = await predictRes.json();
+        const snapshotData = await snapshotRes.json();
 
-        const results = predData?.predicted_role || [];
+        // Check if profile is complete
+        if (!snapshotData.profile_complete) {
+          setNoData(true);
+          setLoading(false);
+          return;
+        }
 
-        const formatted = results.map((item: any) => ({
-          role: item.role,
-          confidence: Number(item.confidence),
-          reasons: Array.isArray(item.reasons) ? item.reasons : []
-        }));
+        // Get predictions from snapshot
+        const results = snapshotData?.predictions || [];
+
+        // Handle both array format and single prediction format
+        let formatted: RolePred[] = [];
+        if (Array.isArray(results) && results.length > 0) {
+          formatted = results.map((item: any) => ({
+            role: item.role || item,
+            confidence: Number(item.confidence || 0),
+            reasons: Array.isArray(item.reasons) ? item.reasons : []
+          }));
+        }
 
         setPredictions(formatted);
       } catch (err: any) {

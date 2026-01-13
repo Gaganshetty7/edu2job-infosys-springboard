@@ -168,3 +168,22 @@ class Project(models.Model):
 
     class Meta:
         db_table = 'projects'
+
+# -------------------------------
+# Dashboard Data
+# -------------------------------
+class DashboardSnapshot(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='dashboard_snapshot'
+    )
+
+    profile_complete = models.BooleanField(default=False)
+
+    predictions = models.JSONField()
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'dashboard_snapshot'

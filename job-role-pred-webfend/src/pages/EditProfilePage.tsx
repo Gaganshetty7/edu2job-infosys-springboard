@@ -168,6 +168,54 @@ export default function EditProfilePage() {
       const res = await api.put("/accounts/updateprofile/", payload);
 
       if (res.status === 200) {
+        // After successful profile update, check if we can make prediction
+        try {
+          const degree = educations.length > 0 && educations[0].degree?.trim() ? educations[0].degree.trim() : null;
+          const skillsList = form.skills
+            .split(",")
+            .map((s) => s.trim())
+            .filter((s) => s.length > 0);
+          const experienceLevel = "entry";
+
+          // Check if all required fields for prediction are present
+          const hasRequiredFields = degree && skillsList.length > 0 && experienceLevel;
+
+          if (hasRequiredFields) {
+            try {
+              const predictRes = await api.post("/ml/predict/", {
+                skills: skillsList,
+                qualification: degree,
+                experience_level: experienceLevel,
+              });
+
+              const predictionResults = predictRes.data?.predicted_role || [];
+
+              // Store predictions in dashboard snapshot with profile_complete = true
+              await api.post("/accounts/dashboard-snapshot/save/", {
+                predictions: predictionResults,
+                profile_complete: true,
+              });
+              
+            } catch (predErr: any) {
+              // If prediction fails, still update snapshot with profile_complete = true, since we have all required fields
+              console.error("Prediction failed", predErr);
+              await api.post("/accounts/dashboard-snapshot/save/", {
+                predictions: [],
+                profile_complete: true,
+              });
+            }
+          } else {
+            // Not all required fields present update snapshot with profile_complete = false
+            await api.post("/accounts/dashboard-snapshot/save/", {
+              predictions: [],
+              profile_complete: false,
+            });
+          }
+        } catch (snapshotErr: any) {
+          // Log snapshot error but don't fail the profile update
+          console.error("Dashboard snapshot update failed", snapshotErr);
+        }
+
         alert("Profile updated successfully!");
         navigate(-1);
       } else {
