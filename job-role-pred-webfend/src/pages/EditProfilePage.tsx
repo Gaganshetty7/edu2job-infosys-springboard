@@ -1,14 +1,16 @@
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
-import { useAuth } from "../auth/AuthContext";
 import "../styles/editprofile.css";
 import { useState, useEffect } from "react";
+import Select from "react-select";
 import api from "../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
 
 export default function EditProfilePage() {
-  const { user } = useAuth();
   const navigate = useNavigate();
+
+  const [selectedSkills, setSelectedSkills] = useState<{ label: string; value: string }[]>([]);
+
 
   const [educations, setEducations] = useState([
     { degree: "", specialization: "", university: "", cgpa: "", year: "" },
@@ -30,16 +32,43 @@ export default function EditProfilePage() {
     { title: "", description: "" },
   ]);
 
-  const [form, setForm] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-    skills: "",
-  });
-
   const [errors, setErrors] = useState<any>({});
 
+  const [metadata, setMetadata] = useState<{
+    qualification: string[];
+    skills: string[];
+    experience_level: string[];
+  } | null>(null);
+
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+  });
+
+
+  // Fetch metadata from backend for dropdowns
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      try {
+        const API = import.meta.env.VITE_API_BASE;
+
+        const resp = await fetch(`${API}/api/ml/metadata/`);
+
+        if (!resp.ok) throw new Error("Failed to fetch metadata");
+        const data = await resp.json();
+        setMetadata(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchMetadata();
+  }, []);
+
+  const skillOptions = metadata?.skills.map((s) => ({ label: s, value: s })) || [];
+
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
     index?: number,
     type?: "edu" | "cert" | "project" | "placement"
   ) => {
@@ -158,7 +187,7 @@ export default function EditProfilePage() {
           job_title: placement.job_title,
           joining_date: placement.joining_date || null,
         },
-        skills: form.skills.split(",").map((s) => ({ skill_name: s.trim() })),
+        skills: selectedSkills.map((s) => ({ skill_name: s.value })),
         projects: projects.map((p) => ({
           title: p.title,
           description: p.description,
@@ -168,16 +197,12 @@ export default function EditProfilePage() {
       const res = await api.put("/accounts/updateprofile/", payload);
 
       if (res.status === 200) {
-        // After successful profile update, check if we can make prediction
         try {
+          // Use only the first education for prediction
           const degree = educations.length > 0 && educations[0].degree?.trim() ? educations[0].degree.trim() : null;
-          const skillsList = form.skills
-            .split(",")
-            .map((s) => s.trim())
-            .filter((s) => s.length > 0);
-          const experienceLevel = "entry";
+          const skillsList = selectedSkills.map((s) => s.value);
+          const experienceLevel = "Entry";
 
-          // Check if all required fields for prediction are present
           const hasRequiredFields = degree && skillsList.length > 0 && experienceLevel;
 
           if (hasRequiredFields) {
@@ -195,9 +220,8 @@ export default function EditProfilePage() {
                 predictions: predictionResults,
                 profile_complete: true,
               });
-              
+
             } catch (predErr: any) {
-              // If prediction fails, still update snapshot with profile_complete = true, since we have all required fields
               console.error("Prediction failed", predErr);
               await api.post("/accounts/dashboard-snapshot/save/", {
                 predictions: [],
@@ -212,7 +236,6 @@ export default function EditProfilePage() {
             });
           }
         } catch (snapshotErr: any) {
-          // Log snapshot error but don't fail the profile update
           console.error("Dashboard snapshot update failed", snapshotErr);
         }
 
@@ -240,8 +263,17 @@ export default function EditProfilePage() {
         setForm({
           name: data.name || "",
           email: data.email || "",
-          skills: data.skills ? data.skills.map((s: any) => s.skill_name).join(", ") : "",
         });
+
+        // Populating skills
+        if (data.skills?.length) {
+          setSelectedSkills(
+            data.skills.map((s: any) => ({
+              label: s.skill_name,
+              value: s.skill_name,
+            }))
+          );
+        }
 
         // Populating educations
         if (data.educations && data.educations.length > 0) {
@@ -339,11 +371,22 @@ export default function EditProfilePage() {
                   <div className="edit-grid" key={idx}>
                     <div className="edit-group">
                       <label>Degree</label>
-                      <input
+                      <select
+                        className="input"
                         name="degree"
                         value={edu.degree}
                         onChange={(e) => handleChange(e, idx, "edu")}
-                      />
+                      >
+
+                        <option value="" disabled>
+                          Select degree
+                        </option>
+                        {metadata?.qualification.map((q) => (
+                          <option key={q} value={q}>
+                            {q}
+                          </option>
+                        ))}
+                      </select>
                       {errors[`degree_${idx}`] && (
                         <small className="error-text">{errors[`degree_${idx}`]}</small>
                       )}
@@ -554,15 +597,17 @@ export default function EditProfilePage() {
             </div>
 
             {/* SKILLS */}
-            <div className="edit-section">Skills (comma separated)</div>
-
-            <div className="edit-group">
-              <input
-                name="skills"
-                value={form.skills}
-                onChange={handleChange}
-                placeholder="Python, React, MySQL"
-              />
+            <div className="edit-section">
+              <label className="edit-section-title">Skills</label>
+              <div className="edit-group">
+                <Select
+                  isMulti
+                  options={skillOptions}
+                  value={selectedSkills}
+                  onChange={(skills) => setSelectedSkills(skills as any)}
+                  placeholder="Select skills"
+                />
+              </div>
             </div>
 
             <button className="edit-save">Save Changes</button>
