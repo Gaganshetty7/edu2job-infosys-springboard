@@ -1,0 +1,7 @@
+name: edu2job_env
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+  - shap
+prefix: C:\Users\gagan\miniconda3\envs\edu2job_env
