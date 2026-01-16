@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import train_view, predict_view, metadata_view, dash_prediction_data, admin_stats, recent_activity, prediction_feedback,train_model
+from .views import train_view, predict_view, metadata_view, dash_prediction_data, admin_stats, recent_activity, prediction_feedback, education_job_trends
 
 urlpatterns = [
     path("admin/train/", train_view),
@@ -9,5 +9,6 @@ urlpatterns = [
     path('admin/stats/', admin_stats),
     path('admin/recent/', recent_activity),
     path("prediction/<int:pk>/feedback/", prediction_feedback),
+    path("education-job-trends/", education_job_trends),
 
 ]

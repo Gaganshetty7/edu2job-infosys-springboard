@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Prediction 
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 
 import os
 import json
@@ -50,13 +51,37 @@ def predict_view(request):
         return Response({"error": "Missing fields"}, status=400)
 
     job = predict_job_role(skills, qualification, experience)
+
+    raw_prediction = job[0]
+
+    if isinstance(raw_prediction, dict) and 'role' in raw_prediction:
+        clean_role = raw_prediction['role']
+    else:
+        # fallback safety
+        clean_role = str(raw_prediction)
      
     # Get prediction result
-    predicted_role = str(job[0])[:250]
     confidence = float(job[1]['confidence'])
 
+    # Get user's degree (if exists)
+    edu = Education.objects.filter(user=request.user).first()
+    degree = edu.degree if edu else None
+
+    raw_prediction = job[0]
+
+    # --- FORCE SINGLE ROLE STORAGE ---
+    if isinstance(raw_prediction, list):
+        clean_role = str(raw_prediction[0])
+    elif isinstance(raw_prediction, dict) and 'role' in raw_prediction:
+        clean_role = str(raw_prediction['role'])
+    else:
+        clean_role = str(raw_prediction)
+
+    clean_role = clean_role.strip()[:255]
+
     prediction = Prediction.objects.create(
-        predicted_roles=predicted_role,
+        predicted_roles=clean_role,
+        education_qualification=degree,
         confidence_scores=confidence,
         timestamp=timezone.now(),
         user_id=request.user.id
@@ -184,3 +209,21 @@ def prediction_feedback(request, pk):
     return Response({"status": "success"})
 
 
+# -----------------------------
+# Education vs Job Role Trends (Public)
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def education_job_trends(request):
+    """
+    Returns counts of predictions grouped by education_qualification and predicted_roles
+    """
+    # Aggregate predictions
+    data = (
+        Prediction.objects
+        .values('education_qualification', 'predicted_roles')
+        .annotate(count=Count('id'))
+        .order_by('education_qualification', 'predicted_roles')
+    )
+
+    return Response(list(data))

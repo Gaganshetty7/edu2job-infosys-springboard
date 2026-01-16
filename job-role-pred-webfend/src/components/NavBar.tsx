@@ -48,6 +48,18 @@ const NavBar = () => {
               </a>
             )}
 
+            {user?.role === "ADMIN" && (
+              <a
+                style={styles.navLink}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/admin-visuals");
+                }}
+              >
+                Visualizations
+              </a>
+            )}
+
 
             <button
               style={styles.navButtonPrimary}
