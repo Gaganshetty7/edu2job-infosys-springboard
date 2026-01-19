@@ -1,0 +1,37 @@
+asgiref==3.11.0
+certifi==2026.1.4
+charset-normalizer==3.4.4
+cloudpickle @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_cloudpickle_1765303462/work
+colorama @ file:///home/conda/feedstock_root/build_artifacts/colorama_1733218098505/work
+Django==5.2.10
+django-cors-headers==4.9.0
+djangorestframework==3.16.1
+djangorestframework_simplejwt==5.5.1
+google-auth==2.47.0
+idna==3.11
+joblib @ file:///home/conda/feedstock_root/build_artifacts/joblib_1765794027227/work
+llvmlite==0.46.0
+mysqlclient==2.2.7
+numba @ file:///D:/bld/numba_1765466590977/work
+numpy @ file:///D:/bld/bld/rattler-build_numpy_1766383319/work/dist/numpy-2.3.5-cp311-cp311-win_amd64.whl#sha256=9c0213be6a453a5f45d4f6d0599208fb6fa5012ad9307c6690690c129fd71eeb
+packaging @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_packaging_1745345660/work
+pandas @ file:///D:/bld/pandas_1764614503455/work
+pyasn1==0.6.2
+pyasn1_modules==0.4.2
+PyJWT==2.10.1
+python-dateutil @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_python-dateutil_1751104122/work
+python-dotenv==1.2.1
+pytz @ file:///home/conda/feedstock_root/build_artifacts/pytz_1742920838005/work
+requests==2.32.5
+rsa==4.9.1
+scikit-learn @ file:///D:/bld/bld/rattler-build_scikit-learn_1765801251/work/dist/scikit_learn-1.8.0-cp311-cp311-win_amd64.whl#sha256=6b709d3d1e68d89c77b77f0fb7aa31e6f68e5148d615ecd56f94da3e1262056b
+scipy @ file:///C:/bld/scipy-split_1768799500391/work/dist/scipy-1.17.0-cp311-cp311-win_amd64.whl#sha256=ab381c0683a4c5959a4eb8ad52025d587189c73b376c9d03fe6886a42f3fe699
+shap @ file:///D:/bld/bld/rattler-build_shap_1765446063/work
+six @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_six_1753199211/work
+slicer @ file:///home/conda/feedstock_root/build_artifacts/slicer_1710029110974/work
+sqlparse==0.5.5
+threadpoolctl @ file:///home/conda/feedstock_root/build_artifacts/threadpoolctl_1741878222898/work
+tqdm @ file:///home/conda/feedstock_root/build_artifacts/tqdm_1735661334605/work
+typing_extensions @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_typing_extensions_1756220668/work
+tzdata @ file:///home/conda/feedstock_root/build_artifacts/python-tzdata_1765719872007/work
+urllib3==2.6.3

@@ -1,4 +1,4 @@
-name: edu2job_env
+ name: edu2job_env
 channels:
   - defaults
 dependencies:
