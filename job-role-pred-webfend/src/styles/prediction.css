@@ -1,118 +1,161 @@
+/* ============================================
+   DESIGN SYSTEM & VARIABLES
+   ============================================ */
 :root {
-    --bg: #f7f9fc;
-    --accent: #1e4fa3;
-    --muted: #7b8390;
-    --glass: rgba(255, 255, 255, 0.6);
-    --glass-border: rgba(10, 20, 40, 0.06);
-    --shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-    --radius: 14px;
+  --bg: #f7f9fc;
+  --accent: #1e4fa3;
+  --muted: #7b8390;
+  --glass: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(10, 20, 40, 0.06);
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  --radius: 14px;
+  --green: rgb(55, 137, 55);
+  --red: rgb(191, 39, 39);
 }
 
+/* ============================================
+   LAYOUT & CONTAINERS
+   ============================================ */
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 0px;
-}
-
-.pgHeader {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    height: 65px;
-}
-
-.pgTitle {
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--accent);
-    margin-top: 60px;
-}
-
-.pgSub {
-    font-size: 13px;
-    color: var(--muted);
-}
-
-.runBtn {
-    margin-left: auto;
-    background: var(--accent);
-    color: white;
-    padding: 8px 14px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 .page {
-    display: grid;
-    grid-template-columns: 360px 1fr;
-    gap: 28px;
-    padding-bottom: 30px;
-    align-items: flex-start;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 28px;
+  padding: 20px 0 30px 0;
+  width: 100%;
+  align-items: flex-start;
 }
 
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.rightBox {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ============================================
+   HEADER SECTION
+   ============================================ */
+.pgHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 65px;
+}
+
+.pgTitle {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-top: 60px;
+}
+
+.pgSub {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ============================================
+   CARDS & BOXES
+   ============================================ */
 .glassBox {
-    background: var(--glass);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow);
-    padding: 18px;
-    border-radius: var(--radius);
-    backdrop-filter: blur(10px);
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  border-radius: var(--radius);
+  backdrop-filter: blur(10px);
 }
 
-.approvalCard{
-    border: solid #1e4fa3 4px;
-    display: block;
-    justify-content: center;
-    align-items: center;
+.approvalCard {
+  border: 4px solid var(--accent);
+  display: block;
 }
 
-/* LEFT FORM */
-
+/* ============================================
+   FORM ELEMENTS
+   ============================================ */
 .leftBox {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 22px;
-    align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .cardTitle {
-    font-weight: 700;
-    margin-bottom: 4px;
+  font-weight: 700;
+  margin-bottom: 4px;
 }
 
 .lbl {
-    font-size: 13px;
-    color: var(--muted);
+  font-size: 13px;
+  color: var(--muted);
 }
 
 .input {
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    background: white;
-    font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: white;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15);
+  outline: none;
 }
 
-/* Buttons */
+/* ============================================
+   BUTTONS
+   ============================================ */
+.runBtn {
+  margin-left: auto;
+  background: var(--accent);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.runBtn:hover {
+  opacity: 0.9;
+}
+
 .btnRow {
-    display: flex;
-    gap: 12px;
+  display: flex;
+  gap: 12px;
 }
 
 .btnPrimary {
-    background: var(--accent);
-    border: none;
-    color: white;
-    padding: 10px 14px;
-    border-radius: 10px;
-    cursor: pointer;
+  background: var(--accent);
+  color: white;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  opacity: 0.9;
 }
 
 .btnPrimary:disabled {
@@ -120,183 +163,267 @@
   cursor: not-allowed;
 }
 
-
 .btnOutline {
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.12);
-    background: white;
-    cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
 }
 
-.btnPrimaryApprove{
-    background-color: rgb(55, 137, 55);
-    color: white;
+.btnOutline:hover {
+  background: #f5f5f5;
 }
 
-.btnPrimaryFlag{
-    background-color: rgb(191, 39, 39);
-    color: white;
+.btnPrimaryApprove {
+  background-color: var(--green);
+  color: white;
+}
+
+.btnPrimaryFlag {
+  background-color: var(--red);
+  color: white;
+}
+
+.clear-btn {
+  background: var(--accent);
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  transition: opacity 0.2s;
+}
+
+.clear-btn:hover {
+  opacity: 0.9;
+}
+
+/* ============================================
+   PREDICTION RESULTS
+   ============================================ */
+.predHeader {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.predWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.empty {
+  background: rgba(255, 255, 255, 0.7);
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px dashed rgba(0, 0, 0, 0.08);
+  color: var(--muted);
+  text-align: center;
+  font-size: 14px;
+}
+
+.roleCard {
+  background: white;
+  padding: 14px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.roleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.roleTitle {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.confVal {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.confBar {
+  height: 8px;
+  background: #eef1f6;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.confFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #0061d5);
+  transition: width 0.4s ease;
+}
+
+.reasons {
+  margin: 10px 0 0 0;
+  padding-left: 20px;
+  font-size: 12px;
+  color: var(--muted);
+  list-style: disc;
+}
+
+.reasons li {
+  margin-bottom: 4px;
+}
+
+/* ============================================
+   FEEDBACK MESSAGES
+   ============================================ */
+.approvalText {
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 12px;
+  font-size: 14px;
 }
 
 .feedbackThanks {
   text-align: center;
   font-weight: 600;
   color: #277a29;
+  padding: 16px;
+  background: #f0f8f1;
+  border-radius: 10px;
 }
 
-
-/* RIGHT RESULTS */
-.rightBox {
-    flex: 1;
+/* ============================================
+   PREVIOUS PREDICTIONS SECTION
+   ============================================ */
+.prevPanel {
+  padding: 22px;
+  margin-top: 20px;
 }
-
-.predHeader {
-    font-weight: 700;
-    color: var(--accent);
-}
-
-.predWrap {
-    display: flex;
-    flex-direction: column;
-    gap: 19px;
-}
-
-.empty {
-    background: rgba(255, 255, 255, 0.7);
-    padding: 24px;
-    border-radius: 12px;
-    border: 1px dashed rgba(0, 0, 0, 0.08);
-    color: var(--muted);
-}
-
-.hint {
-    margin-top: 6px;
-    font-size: 13px;
-}
-
-.roleCard {
-    background: white;
-    padding: 14px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.roleRow {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 6px;
-}
-
-.roleTitle {
-    font-weight: 700;
-}
-
-.confVal {
-    color: var(--accent);
-    font-weight: 700;
-}
-
-.confBar {
-    height: 10px;
-    background: #eef1f6;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.confFill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent), #0061d5);
-    transition: 0.4s;
-}
-
-/* BOTTOM PREV PANEL */
 
 .prevHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 14px;
-}
-
-.prevPanel {
-    padding: 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
 .prevTitle {
-    font-weight: 700;
-    margin-bottom: 14px;
-    font-size: 17px;
-    color: var(--accent);
-}
-
-.clear-btn {
-    background: var(--accent);
-    color: white;
-    border-radius: 20px;
-    border: none;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 700;
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--accent);
 }
 
 .prevList {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .prevItem {
-    background: white;
-    padding: 14px;
-    border-radius: 12px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  background: white;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
 .prevTop {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  gap: 12px;
 }
 
 .prevMeta {
-    font-size: 14px;
+  font-size: 13px;
+  color: #333;
+  line-height: 1.5;
 }
 
 .prevTime {
-    font-size: 12px;
-    color: var(--muted);
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
 }
 
 .prevRoles {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .prevRoleTag {
-    background: #eef4ff;
-    color: #0553c9;
-    padding: 6px 10px;
-    border-radius: 8px;
-    font-size: 13px;
+  background: #eef4ff;
+  color: #0553c9;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .emptySmall {
-    padding: 20px;
-    color: var(--muted);
-    border: 1px dashed rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
+  padding: 20px;
+  color: var(--muted);
+  border: 1px dashed rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  text-align: center;
+  font-size: 14px;
 }
 
-/* Responsive */
-@media(max-width:980px) {
-    .page {
-        grid-template-columns: 1fr;
-    }
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 900px) {
+  .page {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 
-    .runBtn {
-        display: none;
-    }
+  .leftColumn {
+    gap: 16px;
+  }
+
+  .rightBox {
+    gap: 12px;
+  }
+
+  .runBtn {
+    display: none;
+  }
+
+  .prevTop {
+    flex-direction: column;
+  }
+
+  .prevTime {
+    order: -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .page {
+    gap: 16px;
+    padding: 16px 0 24px 0;
+  }
+
+  .pgTitle {
+    font-size: 22px;
+    margin-top: 40px;
+  }
+
+  .prevRoles {
+    flex-direction: column;
+  }
+
+  .prevRoleTag {
+    width: 100%;
+    text-align: center;
+  }
 }

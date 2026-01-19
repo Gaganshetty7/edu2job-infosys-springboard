@@ -4,11 +4,28 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../auth/AuthContext";
 import "../styles/admin.css";
 
+interface AdminStats {
+  total_users: number;
+  predictions: number;
+  approved_roles: number;
+  flagged_predictions: number;
+  model_accuracy: number;
+}
+
+interface RecentActivity {
+  id: number;
+  user_id: number;
+  predicted_role: string;
+  confidence: number;
+  timestamp: string;
+  status: string;
+}
+
 export default function AdminPanelPage() {
   const { user } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<string>("");
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<AdminStats>({
     total_users: 0,
     predictions: 0,
     approved_roles: 0,
@@ -16,9 +33,10 @@ export default function AdminPanelPage() {
     model_accuracy: 0
   });
   const [loading, setLoading] = useState(true);
-  const [recentActivity, setRecentActivity] = useState([]);
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [loadingRecent, setLoadingRecent] = useState(true);
-
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 10;
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) setFile(e.target.files[0]);
@@ -50,7 +68,6 @@ export default function AdminPanelPage() {
       const trainData = await trainRes.json();
       if (!trainRes.ok) throw new Error(trainData.message || "Training failed");
 
-
       //Fetch metadata immediately after
       const metaRes = await fetch(`${API}/api/ml/metadata/`);
       const metaData = await metaRes.json();
@@ -63,29 +80,35 @@ export default function AdminPanelPage() {
     }
   };
 
-  useEffect(() => {
+  const fetchData = async (pageNum: number) => {
     const API = import.meta.env.VITE_API_BASE;
     const token = localStorage.getItem('access');
 
-    // Fetch BOTH at same time
-    Promise.all([
-      fetch(`${API}/api/ml/admin/stats/`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      }).then(res => res.json()),
+    try {
+      const offset = (pageNum - 1) * itemsPerPage;
+      const [statsRes, recentRes] = await Promise.all([
+        fetch(`${API}/api/ml/admin/stats/`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }).then(res => res.json()),
 
-      fetch(`${API}/api/ml/admin/recent/`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      }).then(res => res.json())
-    ])
-      .then(([statsData, recentData]) => {
-        setStats(statsData);
-        setRecentActivity(recentData);
-      })
-      .catch(err => console.error(err))
-      .finally(() => {
-        setLoading(false);
-        setLoadingRecent(false);
-      });
+        fetch(`${API}/api/ml/admin/recent/?offset=${offset}&limit=${itemsPerPage}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }).then(res => res.json())
+      ]);
+
+      setStats(statsRes);
+      setRecentActivity(recentRes);
+      setPage(pageNum);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+      setLoadingRecent(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData(1);
   }, []);
 
 
@@ -161,8 +184,25 @@ export default function AdminPanelPage() {
               ))}
               {loadingRecent && <tr><td colSpan={5}>Loading...</td></tr>}
             </tbody>
-
           </table>
+
+          <div className="paginationControls">
+            <button 
+              className="paginationBtn" 
+              onClick={() => fetchData(page - 1)}
+              disabled={page === 1}
+            >
+              ← View Previous
+            </button>
+            <span className="pageIndicator">Page {page}</span>
+            <button 
+              className="paginationBtn" 
+              onClick={() => fetchData(page + 1)}
+              disabled={recentActivity.length < itemsPerPage}
+            >
+              View Next →
+            </button>
+          </div>
         </section>
 
         <section className="panel">

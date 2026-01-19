@@ -10,6 +10,7 @@ import PredictionPage from "./pages/PredictionPage";
 import EditProfilePage from "./pages/EditProfilePage";
 import AdminPanelPage from "./pages/AdminPanelPage";
 import AdminRoute from "./auth/AdminRoute";
+import AdminVisualizations from "./pages/AdminVisualsPage";
 
 import ProtectedRoute from "./auth/ProtectedRoute";
 
@@ -66,6 +67,15 @@ function App() {
           element={
             <AdminRoute>
               <AdminPanelPage />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin-visuals"
+          element={
+            <AdminRoute>
+              <AdminVisualizations />
             </AdminRoute>
           }
         />

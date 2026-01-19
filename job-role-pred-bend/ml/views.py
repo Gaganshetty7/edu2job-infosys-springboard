@@ -52,31 +52,21 @@ def predict_view(request):
 
     job = predict_job_role(skills, qualification, experience)
 
+    # Extract the first prediction result
     raw_prediction = job[0]
-
+    
+    # Get the predicted role from the result
     if isinstance(raw_prediction, dict) and 'role' in raw_prediction:
         clean_role = raw_prediction['role']
     else:
-        # fallback safety
         clean_role = str(raw_prediction)
      
-    # Get prediction result
-    confidence = float(job[1]['confidence'])
+    # Get confidence score
+    confidence = float(job[0]['confidence'])
 
-    # Get user's degree (if exists)
-    edu = Education.objects.filter(user=request.user).first()
-    degree = edu.degree if edu else None
-
-    raw_prediction = job[0]
-
-    # --- FORCE SINGLE ROLE STORAGE ---
-    if isinstance(raw_prediction, list):
-        clean_role = str(raw_prediction[0])
-    elif isinstance(raw_prediction, dict) and 'role' in raw_prediction:
-        clean_role = str(raw_prediction['role'])
-    else:
-        clean_role = str(raw_prediction)
-
+    # Use the qualification parameter sent from frontend (not user's saved profile)
+    degree = qualification.strip()[:100]
+    
     clean_role = clean_role.strip()[:255]
 
     prediction = Prediction.objects.create(
@@ -151,7 +141,11 @@ def admin_stats(request):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def recent_activity(request):
-    recent = Prediction.objects.order_by('-timestamp')[:10]
+    # Get pagination parameters
+    offset = int(request.query_params.get('offset', 0))
+    limit = int(request.query_params.get('limit', 10))
+    
+    recent = Prediction.objects.order_by('-timestamp')[offset:offset+limit]
     
     result = []
     for p in recent:
