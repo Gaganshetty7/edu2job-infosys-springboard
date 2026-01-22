@@ -1,6 +1,8 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.utils import timezone
+
 
 # -------------------------------
 # User Manager
@@ -10,7 +12,13 @@ class CustomUserManager(BaseUserManager):
         if not email:
             raise ValueError('Users must have an email address')
         email = self.normalize_email(email)
-        user = self.model(email=email, name=name, role=role, **extra_fields)
+
+        user = self.model(
+            email=email,
+            name=name,
+            role=role,
+            **extra_fields
+        )
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -33,8 +41,11 @@ class Users(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=100)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='USER')
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(default=timezone.now)
 
     objects = CustomUserManager()
 
@@ -60,8 +71,9 @@ class Education(models.Model):
     degree = models.CharField(max_length=50)
     specialization = models.CharField(max_length=100)
     university = models.CharField(max_length=100)
-    cgpa = models.DecimalField(max_digits=3, decimal_places=2)
-    year_of_completion = models.IntegerField()
+
+    cgpa = models.DecimalField(max_digits=4, decimal_places=2)
+    year_of_completion = models.PositiveIntegerField()
 
     class Meta:
         db_table = 'education'
@@ -85,23 +97,6 @@ class Certification(models.Model):
 
 
 # -------------------------------
-# Prediction History
-# -------------------------------
-class PredictionHistory(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='prediction_histories'
-    )
-    predicted_roles = models.CharField(max_length=255)
-    confidence_scores = models.DecimalField(max_digits=5, decimal_places=2)
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = 'prediction_history'
-
-
-# -------------------------------
 # Admin Logs
 # -------------------------------
 class AdminLogs(models.Model):
@@ -116,10 +111,31 @@ class AdminLogs(models.Model):
         related_name='target_logs'
     )
     action_type = models.CharField(max_length=255)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(default=timezone.now)
 
     class Meta:
         db_table = 'admin_logs'
+
+
+# -------------------------------
+# Prediction History
+# -------------------------------
+class Prediction(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='predictions'
+    )
+    predicted_roles = models.CharField(max_length=255)
+    education_qualification = models.CharField(max_length=100, null=True, blank=True)
+    confidence_scores = models.DecimalField(max_digits=5, decimal_places=2)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_approved = models.BooleanField(default=False)
+    is_flagged = models.BooleanField(default=False)
+    approved_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'prediction_history'
 
 
 # -------------------------------
@@ -131,8 +147,8 @@ class PlacementStatus(models.Model):
         on_delete=models.CASCADE,
         related_name='placement_status'
     )
-    company = models.CharField(max_length=255)
-    job_title = models.CharField(max_length=255)
+    company = models.CharField(max_length=255, null=True, blank=True)
+    job_title = models.CharField(max_length=255, null=True, blank=True)
     joining_date = models.DateField(null=True, blank=True)
 
     class Meta:
@@ -164,10 +180,11 @@ class Project(models.Model):
         related_name='projects'
     )
     title = models.CharField(max_length=255)
-    description = models.TextField()
+    description = models.TextField(blank=True)
 
     class Meta:
         db_table = 'projects'
+
 
 # -------------------------------
 # Dashboard Data
@@ -180,9 +197,7 @@ class DashboardSnapshot(models.Model):
     )
 
     profile_complete = models.BooleanField(default=False)
-
-    predictions = models.JSONField()
-
+    predictions = models.JSONField(default=dict)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

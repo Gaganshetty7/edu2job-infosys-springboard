@@ -12,12 +12,11 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import UserProfileSerializer
 from django.db import transaction
 
-from .models import Users, Education, Certification, PredictionHistory, AdminLogs, PlacementStatus, Skill, Project, DashboardSnapshot
+from .models import Users, Education, Certification, AdminLogs, PlacementStatus, Skill, Project, DashboardSnapshot
 from .serializers import (
     UserSerializer,
     EducationSerializer,
     CertificationSerializer,
-    PredictionHistorySerializer,
     AdminLogsSerializer,
     MyTokenObtainPairSerializer,
     PlacementStatusSerializer,
@@ -120,11 +119,7 @@ class CertificationViewSet(viewsets.ModelViewSet):
     queryset = Certification.objects.all()
     serializer_class = CertificationSerializer
     permission_classes = [permissions.IsAuthenticated]
-
-class PredictionHistoryViewSet(viewsets.ModelViewSet):
-    queryset = PredictionHistory.objects.all()
-    serializer_class = PredictionHistorySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    
 
 class AdminLogsViewSet(viewsets.ModelViewSet):
     queryset = AdminLogs.objects.all()

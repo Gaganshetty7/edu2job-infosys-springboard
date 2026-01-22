@@ -1,8 +1,8 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
-    PlacementStatusViewSet, ProjectViewSet, SkillViewSet, UserViewSet, EducationViewSet, CertificationViewSet,
-    PredictionHistoryViewSet, AdminLogsViewSet, MyTokenObtainPairView,
+    PlacementStatusViewSet, ProjectViewSet, SkillViewSet, UserViewSet, EducationViewSet, CertificationViewSet
+    , AdminLogsViewSet, MyTokenObtainPairView,
     my_profile, register_user, update_profile,
     get_dashboard_snapshot, upsert_dashboard_snapshot
 )
@@ -13,7 +13,6 @@ router = DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'educations', EducationViewSet)
 router.register(r'certifications', CertificationViewSet)
-router.register(r'prediction-history', PredictionHistoryViewSet)
 router.register(r'admin-logs', AdminLogsViewSet)
 router.register(r'placement-status', PlacementStatusViewSet)
 router.register(r'skills', SkillViewSet)

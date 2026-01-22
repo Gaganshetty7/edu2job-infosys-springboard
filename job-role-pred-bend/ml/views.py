@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
-from .models import Prediction 
+from accounts.models import Prediction
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.db.models import Count
@@ -55,26 +55,24 @@ def predict_view(request):
     # Extract the first prediction result
     raw_prediction = job[0]
     
-    # Get the predicted role from the result
-    if isinstance(raw_prediction, dict) and 'role' in raw_prediction:
-        clean_role = raw_prediction['role']
-    else:
-        clean_role = str(raw_prediction)
-     
-    # Get confidence score
-    confidence = float(job[0]['confidence'])
-
-    # Use the qualification parameter sent from frontend (not user's saved profile)
-    degree = qualification.strip()[:100]
+    # Validate prediction structure
+    if not isinstance(raw_prediction, dict) or 'role' not in raw_prediction:
+        return Response({"error": "Invalid prediction format"}, status=500)
     
-    clean_role = clean_role.strip()[:255]
+    clean_role = raw_prediction['role'].strip()[:255]
+    confidence = float(raw_prediction.get('confidence', 0.0))
+
+    if confidence == 0.0:
+        return Response({"error": "Prediction confidence too low"}, status=400)
+
+    # Use the qualification parameter sent from frontend
+    degree = qualification.strip()[:100]
 
     prediction = Prediction.objects.create(
+        user=request.user,
         predicted_roles=clean_role,
         education_qualification=degree,
-        confidence_scores=confidence,
-        timestamp=timezone.now(),
-        user_id=request.user.id
+        confidence_scores=confidence
     )
 
     
@@ -149,25 +147,16 @@ def recent_activity(request):
     
     result = []
     for p in recent:
-        role = p.predicted_roles
-        
-        # Extract role from JSON string
-        if role.startswith('{'):
-            try:
-                import re
-                match = re.search(r"'role':\s*'([^']+)'", role)
-                role = match.group(1) if match else role[:30]
-            except:
-                role = role[:30]
+        role = p.predicted_roles[:50]  # Truncate for display
         
         result.append({
             'id': p.id,
-            'user_id': p.user_id,
-            'predicted_role': role,  # Clean name only
+            'user_id': p.user.id,
+            'user_email': p.user.email,
+            'predicted_role': role,
             'confidence': float(p.confidence_scores),
             'timestamp': p.timestamp.strftime('%b %d, %H:%M'),
-            'status': 'Approved' if (p.is_approved) else 
-                     'Flagged' if (p.is_flagged) else 'Pending',
+            'status': 'Approved' if p.is_approved else 'Flagged' if p.is_flagged else 'Pending',
         })
     
     return Response(result)
@@ -194,8 +183,7 @@ def prediction_feedback(request, pk):
     if action == "approve":
         prediction.is_approved = True
         prediction.approved_at = timezone.now()
-
-    if action == "flag":
+    elif action == "flag":
         prediction.is_flagged = True
 
     prediction.save()

@@ -13,6 +13,7 @@ import AdminRoute from "./auth/AdminRoute";
 import AdminVisualizations from "./pages/AdminVisualsPage";
 
 import ProtectedRoute from "./auth/ProtectedRoute";
+import TestimonialsPage from "./pages/TestimonialsPage";
 
 function App() {
   return (
@@ -49,6 +50,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/testimonials"
+          element={
+            <ProtectedRoute>
+              <TestimonialsPage />
             </ProtectedRoute>
           }
         />

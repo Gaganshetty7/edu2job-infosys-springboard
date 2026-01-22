@@ -48,6 +48,18 @@ const NavBar = () => {
               </a>
             )}
 
+            {!(user?.role === "ADMIN") && (
+              <a
+                style={styles.navLink}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/testimonials");
+                }}
+              >
+                Testimonals
+              </a>
+            )}
+
             {user?.role === "ADMIN" && (
               <a
                 style={styles.navLink}
