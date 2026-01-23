@@ -64,9 +64,7 @@ MIDDLEWARE = [
 ]
 
 # CORS
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # React dev server
-]
+CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:5173').split(',')
 CORS_ALLOW_CREDENTIALS = True
 
 
@@ -166,6 +164,9 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
+
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+
 
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.Users'

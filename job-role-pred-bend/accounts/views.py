@@ -11,6 +11,8 @@ from google.auth.transport import requests
 from rest_framework.permissions import IsAuthenticated
 from .serializers import UserProfileSerializer
 from django.db import transaction
+from django.conf import settings
+
 
 from .models import Users, Education, Certification, AdminLogs, PlacementStatus, Skill, Project, DashboardSnapshot
 from .serializers import (
@@ -23,6 +25,7 @@ from .serializers import (
     SkillSerializer,
     ProjectSerializer
 )
+import os
 
 # -----------------------------
 # Simple JWT Login View
@@ -33,8 +36,8 @@ class MyTokenObtainPairView(TokenObtainPairView):
 # Get the User model
 User = get_user_model()
 
-# Your Google client ID from Google Cloud Console
-GOOGLE_CLIENT_ID = "569496744656-q633fh30ns9c7qar292ul1brslib2qtj.apps.googleusercontent.com"
+# Get Google client ID
+GOOGLE_CLIENT_ID = settings.GOOGLE_CLIENT_ID
 
 # -----------------------------
 # Google Login
