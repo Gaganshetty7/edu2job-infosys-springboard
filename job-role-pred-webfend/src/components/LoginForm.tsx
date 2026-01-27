@@ -72,18 +72,21 @@ export default function LoginForm() {
       <div style={{ marginTop: 10 }}>
         <GoogleLogin
           onSuccess={async (credentialResponse: CredentialResponse) => {
+
             if (!credentialResponse.credential) {
-              setError("Google login failed");
+              setError("Google login failed - no credential");
               return;
             }
 
-            const res = await loginWithGoogle(
-              credentialResponse.credential
-            );
+            const res = await loginWithGoogle(credentialResponse.credential);
 
             if (!res.ok) {
               setError(res.msg);
             }
+          }}
+          onError={() => {
+            console.log("GoogleLogin onError called");
+            setError("Google login failed");
           }}
         />
       </div>

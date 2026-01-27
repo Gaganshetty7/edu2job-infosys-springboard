@@ -48,7 +48,6 @@ const NavBar = () => {
               </a>
             )}
 
-            {!(user?.role === "ADMIN") && (
               <a
                 style={styles.navLink}
                 onClick={(e) => {
@@ -58,7 +57,6 @@ const NavBar = () => {
               >
                 Testimonals
               </a>
-            )}
 
             {user?.role === "ADMIN" && (
               <a

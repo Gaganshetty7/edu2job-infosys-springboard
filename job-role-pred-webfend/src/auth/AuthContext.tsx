@@ -1,7 +1,7 @@
 // src/auth/AuthContext.tsx
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import api from "../api/axiosInstance";
+import api, { setAuthToken } from "../api/axiosInstance";
 import axios from "axios";
 
 interface User {
@@ -31,9 +31,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Attach token automatically to axios
   useEffect(() => {
     if (accessToken) {
-      api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+      setAuthToken(accessToken);
     } else {
-      delete api.defaults.headers.common["Authorization"];
+      setAuthToken(null);
     }
   }, [accessToken]);
 
@@ -154,6 +154,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     setUser(null);
     setAccessToken(null);
+    setAuthToken(null);
     localStorage.removeItem("access");
     localStorage.removeItem("refresh");
     localStorage.removeItem("user");
