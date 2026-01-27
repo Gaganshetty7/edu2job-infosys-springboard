@@ -257,7 +257,6 @@ export default function EditProfilePage() {
       try {
         const res = await api.get("/accounts/myprofile/");
         const data = res.data;
-        console.log("PROFILE DATA:", data);
 
         // Populating basic info
         setForm({

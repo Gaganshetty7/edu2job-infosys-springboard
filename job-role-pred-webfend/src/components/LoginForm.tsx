@@ -85,7 +85,6 @@ export default function LoginForm() {
             }
           }}
           onError={() => {
-            console.log("GoogleLogin onError called");
             setError("Google login failed");
           }}
         />

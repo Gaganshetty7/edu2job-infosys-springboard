@@ -88,7 +88,6 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (err) {
         // Refresh failed or timed out - clear tokens and redirect to login
-        console.error("Token refresh failed:", err);
         localStorage.removeItem("access");
         localStorage.removeItem("refresh");
         localStorage.removeItem("user");

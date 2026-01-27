@@ -75,7 +75,7 @@ export default function UserProfilePage() {
                 const res = await api.get("/accounts/myprofile/");
                 setProfile(res.data);
             } catch (err: any) {
-                console.log("PROFILE FETCH FAILED:", err?.response || err);
+                // Error fetching profile - handled silently
             } finally {
                 setLoading(false);
             }

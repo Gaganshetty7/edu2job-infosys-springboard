@@ -63,7 +63,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       return { ok: true, msg: "Login successful" };
     } catch (err: any) {
-      console.log(err.response?.data || err.message);
       return { ok: false, msg: "Invalid email or password" };
     }
   };
@@ -90,18 +89,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return { ok: true, msg: "Login successful" }; // ✅ always include msg
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        // Backend response exists
-        if (err.response) {
-          console.log("Axios error response data:", err.response.data);
-          console.log("Axios error response status:", err.response.status);
-          console.log("Axios error response headers:", err.response.headers);
-        } else {
-          console.log("Axios error message:", err.message);
-        }
+        // Backend response exists - silently handle
+        // Error details not logged to prevent sensitive data exposure
       } else if (err instanceof Error) {
-        console.log("Error message:", err.message);
+        // Error handled silently
       } else {
-        console.log("Unknown error:", err);
+        // Unknown error handled silently
       }
 
       // Optional: show backend error in UI for debugging (can remove later)
