@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
-import "../styles/auth.css";
+import "../styles/login.css";
 import { GoogleLogin } from "@react-oauth/google";
 import type { CredentialResponse } from "@react-oauth/google";
 
@@ -36,10 +36,10 @@ export default function LoginForm() {
 
   return (
     <form className="auth-card" onSubmit={handleSubmit}>
-      <div className="auth-title">Welcome back</div>
-      <div className="auth-subtitle">Login to continue your journey</div>
+      <h2 className="auth-title">Welcome back</h2>
+      <p className="auth-subtitle">Login to continue your journey</p>
 
-      {error && <div style={{ color: "red", marginBottom: 10 }}>{error}</div>}
+      {error && <div className="auth-error">{error}</div>}
 
       <div className="auth-field">
         <label>Email</label>
@@ -61,32 +61,28 @@ export default function LoginForm() {
         />
       </div>
 
-      <div style={{ textAlign: "right", marginBottom: 14 }}>
+      <div className="auth-forgot">
         <Link to="/forgot-password">Forgot password?</Link>
       </div>
 
-      <button type="submit" className="auth-btn">
-        Login
-      </button>
+      <button type="submit" className="auth-btn">Login</button>
 
-      <div style={{ marginTop: 10 }}>
+      <div className="auth-divider">OR</div>
+
+      <div className="google-wrapper">
         <GoogleLogin
           onSuccess={async (credentialResponse: CredentialResponse) => {
-
             if (!credentialResponse.credential) {
               setError("Google login failed - no credential");
               return;
             }
 
-            const res = await loginWithGoogle(credentialResponse.credential);
-
-            if (!res.ok) {
-              setError(res.msg);
-            }
+            const res = await loginWithGoogle(
+              credentialResponse.credential
+            );
+            if (!res.ok) setError(res.msg);
           }}
-          onError={() => {
-            setError("Google login failed");
-          }}
+          onError={() => setError("Google login failed")}
         />
       </div>
 

@@ -7,6 +7,7 @@ Django==5.2.10
 django-cors-headers==4.9.0
 djangorestframework==3.16.1
 djangorestframework_simplejwt==5.5.1
+git-filter-repo==2.47.0
 google-auth==2.47.0
 idna==3.11
 joblib @ file:///home/conda/feedstock_root/build_artifacts/joblib_1765794027227/work
@@ -16,6 +17,8 @@ numba @ file:///D:/bld/numba_1765466590977/work
 numpy @ file:///D:/bld/bld/rattler-build_numpy_1766383319/work/dist/numpy-2.3.5-cp311-cp311-win_amd64.whl#sha256=9c0213be6a453a5f45d4f6d0599208fb6fa5012ad9307c6690690c129fd71eeb
 packaging @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_packaging_1745345660/work
 pandas @ file:///D:/bld/pandas_1764614503455/work
+psycopg==3.3.2
+psycopg-binary==3.3.2
 pyasn1==0.6.2
 pyasn1_modules==0.4.2
 PyJWT==2.10.1

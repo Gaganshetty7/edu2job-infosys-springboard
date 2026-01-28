@@ -30,7 +30,12 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    ".railway.app",
+    ".vercel.app",
+    "localhost",
+    "127.0.0.1",
+]
 
 
 # Application definition
@@ -66,6 +71,16 @@ MIDDLEWARE = [
 # CORS
 CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:5173').split(',')
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.railway\.app$",
+    r"^https://.*\.vercel\.app$",
+]
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.railway.app",
+    "https://*.vercel.app",
+]
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 
 ROOT_URLCONF = 'backend.urls'
@@ -176,3 +191,4 @@ import os
 ML_MODEL_PATH = os.path.join(BASE_DIR, "ml","saved_models","model.pkl")
 ML_ENCODER_PATH = os.path.join(BASE_DIR, "ml","saved_models","encoders.pkl")
 ML_METADATA_PATH = os.path.join(BASE_DIR, "ml","saved_models","metadata.json")
+
