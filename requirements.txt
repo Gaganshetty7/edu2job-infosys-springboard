@@ -1,35 +1,56 @@
-# Critical Django + Render packages — pin these versions
-Django>=5.2,<6
-djangorestframework>=3.16,<4
-djangorestframework-simplejwt>=5.5,<6
-gunicorn>=24,<25
-psycopg[binary]>=3.3,<4 
-dj-database-url>=3.1,<4
-django-cors-headers>=4.9,<5
-whitenoise>=6.8,<7
-python-dotenv>=1.2,<2
+# ===============================
+# Core Django + Render (PINNED)
+# ===============================
+Django==5.2.10
+djangorestframework==3.16.1
+djangorestframework-simplejwt==5.5.1
+gunicorn==24.1.1
+dj-database-url==3.1.0
+django-cors-headers==4.9.0
+whitenoise==6.8.2
+python-dotenv==1.2.1
+sqlparse==0.5.5
+asgiref==3.11.0
+tzdata
 
-# ML and utility packages — no exact versions, pip will install latest stable
+# ===============================
+# Database Drivers
+# ===============================
+psycopg-binary==3.3.2
+mysqlclient==2.2.7
+
+# ===============================
+# ML / Data Science (UNPINNED SAFE)
+# ===============================
 numpy
 pandas
 scikit-learn
-python-decouple
 scipy
 joblib
 cloudpickle
 numba
 llvmlite
 shap
-requests
-urllib3
-python-dateutil
-pytz
-six
-tqdm
-colorama
-rsa
-sqlparse
 threadpoolctl
 slicer
+tqdm
+
+# ===============================
+# Networking / Auth / Utils
+# ===============================
+requests==2.32.5
+urllib3==2.6.3
+certifi==2026.1.4
+charset-normalizer==3.4.4
+idna==3.11
+rsa==4.9.1
+pyasn1==0.6.2
+pyasn1-modules==0.4.2
+PyJWT==2.10.1
+google-auth==2.47.0
+six
 typing-extensions
-tzdata
+colorama
+pytz
+python-dateutil
+packaging
