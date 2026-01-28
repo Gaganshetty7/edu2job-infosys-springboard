@@ -14,6 +14,9 @@ from dotenv import load_dotenv
 from pathlib import Path
 from datetime import timedelta
 from urllib.parse import urlparse, parse_qsl
+from decouple import config
+
+
 
 load_dotenv()
 
@@ -24,14 +27,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG') == 'True'
+SECRET_KEY = config("SECRET_KEY")
+DEBUG = config("DEBUG", cast=bool, default=False)
 
 ALLOWED_HOSTS = [
-    ".railway.app",
+    ".onrender.com",
     ".vercel.app",
     "localhost",
     "127.0.0.1",
@@ -60,6 +60,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -68,15 +69,18 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+
 # CORS
 CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:5173').split(',')
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https://.*\.railway\.app$",
+    r"^https://.*\.onrender\.com$",
     r"^https://.*\.vercel\.app$",
 ]
 CSRF_TRUSTED_ORIGINS = [
-    "https://*.railway.app",
+    "https://*.onrender.com",
     "https://*.vercel.app",
 ]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -157,7 +161,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -187,7 +193,6 @@ GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 AUTH_USER_MODEL = 'accounts.Users'
 
 # ML model paths
-import os
 ML_MODEL_PATH = os.path.join(BASE_DIR, "ml","saved_models","model.pkl")
 ML_ENCODER_PATH = os.path.join(BASE_DIR, "ml","saved_models","encoders.pkl")
 ML_METADATA_PATH = os.path.join(BASE_DIR, "ml","saved_models","metadata.json")

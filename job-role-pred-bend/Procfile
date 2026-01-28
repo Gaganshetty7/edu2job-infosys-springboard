@@ -1,1 +1,1 @@
-web: gunicorn job_role_pred.wsgi 
+web: gunicorn backend.wsgi 
