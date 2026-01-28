@@ -41,7 +41,7 @@ nbconvert==7.16.6
 nbformat==5.10.4
 numba==0.63.1
 numpy==2.3.5
-packaging @ file:///C:/miniconda3/conda-bld/packaging_1761049096285/work
+packaging
 pandas==3.0.0
 pandocfilters==1.5.1
 parso==0.8.5
