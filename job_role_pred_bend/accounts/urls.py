@@ -4,7 +4,8 @@ from .views import (
     PlacementStatusViewSet, ProjectViewSet, SkillViewSet, UserViewSet, EducationViewSet, CertificationViewSet
     , AdminLogsViewSet, MyTokenObtainPairView,
     my_profile, register_user, update_profile,
-    get_dashboard_snapshot, upsert_dashboard_snapshot
+    get_dashboard_snapshot, upsert_dashboard_snapshot, get_testimonials,
+    submit_testimonial, approve_testimonial, fetch_pending_testimonials
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import google_login
@@ -28,4 +29,9 @@ urlpatterns = [
     path("updateprofile/", update_profile, name="update_profile"),
     path("dashboard-snapshot/", get_dashboard_snapshot, name="get-dashboard-snapshot"),
     path("dashboard-snapshot/save/", upsert_dashboard_snapshot, name="upsert-dashboard-snapshot"),
+    path("testimonials/", get_testimonials),
+    path("testimonials/submit/", submit_testimonial),
+    path("admin/testimonials/<int:testimonial_id>/approve/", approve_testimonial),
+    path("admin/testimonials/pending/",fetch_pending_testimonials,name="admin-pending-testimonials"
+),
 ]

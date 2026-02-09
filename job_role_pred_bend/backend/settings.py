@@ -197,3 +197,6 @@ ML_MODEL_PATH = os.path.join(BASE_DIR, "ml","saved_models","model.pkl")
 ML_ENCODER_PATH = os.path.join(BASE_DIR, "ml","saved_models","encoders.pkl")
 ML_METADATA_PATH = os.path.join(BASE_DIR, "ml","saved_models","metadata.json")
 
+# Training toggle - disabled by default in production
+ENABLE_TRAINING = config("ENABLE_TRAINING", cast=bool, default=False)
+

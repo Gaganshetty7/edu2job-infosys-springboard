@@ -3,9 +3,12 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser, AllowAny
+from rest_framework.generics import ListAPIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from rest_framework.permissions import IsAuthenticated
@@ -14,7 +17,7 @@ from django.db import transaction
 from django.conf import settings
 
 
-from .models import Users, Education, Certification, AdminLogs, PlacementStatus, Skill, Project, DashboardSnapshot
+from .models import Users, Education, Certification, AdminLogs, PlacementStatus, Skill, Project, DashboardSnapshot, Testimonial
 from .serializers import (
     UserSerializer,
     EducationSerializer,
@@ -23,7 +26,8 @@ from .serializers import (
     MyTokenObtainPairSerializer,
     PlacementStatusSerializer,
     SkillSerializer,
-    ProjectSerializer
+    ProjectSerializer,
+    TestimonialSerializer
 )
 import os
 
@@ -286,3 +290,111 @@ def upsert_dashboard_snapshot(request):
         status=status.HTTP_200_OK
     )
 
+# -------------------------------
+# Get Approved Testimonials
+# -------------------------------
+@api_view(["GET"])
+def get_testimonials(request):
+    testimonials = Testimonial.objects.filter(is_approved=True).order_by("-created_at")
+
+    serializer = TestimonialSerializer(testimonials, many=True)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+# -------------------------------
+# Submit Testimonial
+# -------------------------------
+@api_view(["POST"])
+def submit_testimonial(request):
+    serializer = TestimonialSerializer(data=request.data)
+
+    if not serializer.is_valid():
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    serializer.save()  # is_approved defaults to False
+
+    return Response(
+        {"message": "Testimonial submitted for review"},
+        status=status.HTTP_201_CREATED
+    )
+
+# -------------------------------
+# Approve / Reject Testimonial
+# -------------------------------
+@api_view(["PATCH"])
+@permission_classes([IsAdminUser])
+def approve_testimonial(request, testimonial_id):
+    try:
+        testimonial = Testimonial.objects.get(id=testimonial_id)
+    except Testimonial.DoesNotExist:
+        return Response(
+            {"error": "Testimonial not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    is_approved = request.data.get("is_approved")
+
+    if is_approved is None:
+        return Response(
+            {"error": "is_approved field is required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    testimonial.is_approved = bool(is_approved)
+    testimonial.save(update_fields=["is_approved"])
+
+    return Response(
+        {
+            "message": "Testimonial status updated",
+            "is_approved": testimonial.is_approved
+        },
+        status=status.HTTP_200_OK
+    )
+
+# -----------------------------
+# Fetch Pending Testimonials (Admin)
+# -----------------------------
+@api_view(["GET"])
+@permission_classes([IsAdminUser])
+def fetch_pending_testimonials(request):
+    offset = int(request.query_params.get("offset", 0))
+    limit = int(request.query_params.get("limit", 10))
+
+    search = request.query_params.get("search", "").strip()
+    sort = request.query_params.get("sort", "created_at")
+    order = request.query_params.get("order", "desc")
+
+    queryset = Testimonial.objects.filter(is_approved=False)
+
+    # search
+    if search:
+        queryset = queryset.filter(
+            Q(name__icontains=search) |
+            Q(testimonial_text__icontains=search)
+        )
+
+    # sorting
+    if order == "desc":
+        sort = f"-{sort}"
+
+    queryset = queryset.order_by(sort)
+
+    testimonials = queryset[offset : offset + limit]
+
+    result = []
+    for t in testimonials:
+        result.append({
+            "id": t.id,
+            "name": t.name,
+            "rating": t.rating,
+            "testimonial_text": t.testimonial_text,
+            "created_at": t.created_at.strftime("%b %d, %Y"),
+        })
+
+    return Response({
+        "count": queryset.count(),
+        "results": result
+    })

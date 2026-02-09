@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import Users, Education, Certification, AdminLogs, PlacementStatus, Skill, Project, Prediction
+from .models import Users, Education, Certification, AdminLogs, PlacementStatus, Skill, Project, Prediction, Testimonial
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 # -------------------------------
@@ -150,4 +150,30 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'placement_status',
             'skills',
             'projects'
+        ]
+# -------------------------------
+# Testimonial
+# -------------------------------
+class TestimonialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Testimonial
+        fields = (
+            "id",
+            "name",
+            "role",
+            "testimonial_text",
+            "rating",
+        )
+# -------------------------------
+# Admin Pending Testimonial Serializer
+# -------------------------------
+class AdminPendingTestimonialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Testimonial
+        fields = [
+            "id",
+            "name",
+            "rating",
+            "message",
+            "created_at",
         ]

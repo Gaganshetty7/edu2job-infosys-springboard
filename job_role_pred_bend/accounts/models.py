@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
+from django.db.models import CheckConstraint, Q
 
 
 # -------------------------------
@@ -202,3 +203,33 @@ class DashboardSnapshot(models.Model):
 
     class Meta:
         db_table = 'dashboard_snapshot'
+
+# -------------------------------
+# Testimonials Data
+# -------------------------------
+from django.core.validators import MinValueValidator, MaxValueValidator
+
+class Testimonial(models.Model):
+    name = models.CharField(max_length=100)
+    role = models.CharField(max_length=150)
+
+    testimonial_text = models.TextField()
+
+    rating = models.PositiveSmallIntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(5),
+        ]
+    )
+
+    is_approved = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "testimonials"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.name} ({self.rating}★)"

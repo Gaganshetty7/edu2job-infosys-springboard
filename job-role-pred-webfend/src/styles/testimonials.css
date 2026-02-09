@@ -18,6 +18,191 @@
     padding-bottom: 40px;
 }
 
+/* Feedback Form */
+.feedbackForm {
+    background: white;
+    padding: 28px;
+}
+
+.formTitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 20px;
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.formGroup label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.formGroup input:disabled,
+.formGroup select:disabled,
+.formGroup textarea:disabled {
+    background: #f5f5f5;
+    cursor: not-allowed;
+}
+
+.formGroup textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.submitBtn {
+    background: var(--accent);
+    border: none;
+    color: white;
+    padding: 12px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.2s;
+    margin-top: 8px;
+}
+
+.submitBtn:hover:not(:disabled) {
+    background: #1a3f8a;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(30, 79, 163, 0.25);
+}
+
+.submitBtn:disabled {
+    background: #999;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.successMessage {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.errorMessage {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+/* Admin Panel */
+.adminPanel {
+    background: white;
+    padding: 28px;
+}
+
+.adminTitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 20px;
+}
+
+.pendingGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.pendingCard {
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.pendingContent {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.adminActions {
+    display: flex;
+    gap: 12px;
+}
+
+.approveBtn,
+.rejectBtn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.approveBtn {
+    background: #28a745;
+    color: white;
+}
+
+.approveBtn:hover:not(:disabled) {
+    background: #218838;
+    transform: translateY(-1px);
+}
+
+.rejectBtn {
+    background: #dc3545;
+    color: white;
+}
+
+.rejectBtn:hover:not(:disabled) {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+.approveBtn:disabled,
+.rejectBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
 /* Testimonials Grid */
 .testGrid {
     display: grid;
@@ -100,6 +285,46 @@
     color: #e0e0e0;
 }
 
+/* Loading & Empty States */
+.loadingState,
+.emptyState,
+.errorState {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.emptyState p {
+    font-size: 16px;
+    margin: 0;
+}
+
+.emptyStateSubtext {
+    font-size: 14px;
+    color: #999;
+    margin-top: 8px;
+}
+
+.errorState p {
+    color: #dc3545;
+    font-size: 15px;
+}
+
 /* CTA Section */
 .testCta {
     text-align: center;
@@ -148,6 +373,14 @@
         grid-template-columns: repeat(2, 1fr);
         gap: 20px;
     }
+
+    .pendingGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .formGrid {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 640px) {
@@ -176,5 +409,19 @@
 
     .ctaText {
         font-size: 14px;
+    }
+
+    .feedbackForm,
+    .adminPanel {
+        padding: 20px;
+    }
+
+    .formTitle,
+    .adminTitle {
+        font-size: 18px;
+    }
+
+    .adminActions {
+        flex-direction: column;
     }
 }

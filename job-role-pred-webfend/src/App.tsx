@@ -11,6 +11,7 @@ import EditProfilePage from "./pages/EditProfilePage";
 import AdminPanelPage from "./pages/AdminPanelPage";
 import AdminRoute from "./auth/AdminRoute";
 import AdminVisualizations from "./pages/AdminVisualsPage";
+import AdminModerationPage from "./pages/AdminModerationPage";
 
 import ProtectedRoute from "./auth/ProtectedRoute";
 import TestimonialsPage from "./pages/TestimonialsPage";
@@ -72,6 +73,16 @@ function App() {
           }
         />
 
+
+        <Route
+          path="/testimonials"
+          element={
+            <ProtectedRoute>
+              <TestimonialsPage />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/admin"
           element={
@@ -86,6 +97,15 @@ function App() {
           element={
             <AdminRoute>
               <AdminVisualizations />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/moderation"
+          element={
+            <AdminRoute>
+              <AdminModerationPage />
             </AdminRoute>
           }
         />

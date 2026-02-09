@@ -97,7 +97,7 @@ export default function UserProfilePage() {
                     {/* Banner */}
                     <div className="ProfileBanner">
                         <div className="ProfileBannerInner">
-                            <img src="/profile.jpg" className="ProfilePhoto" />
+                            {/* <img src="/profile.jpg" className="ProfilePhoto" /> */}
 
                             <div className="ProfileHeader">
                                 <p className="ProfileName">{profile.name}</p>

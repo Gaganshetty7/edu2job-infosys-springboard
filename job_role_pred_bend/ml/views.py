@@ -14,15 +14,22 @@ import os
 import json
 from accounts.models import Education, Skill
 
-from .train import train_model
-from .predict import predict_job_role
-
 
 # --- TRAIN (ADMIN ONLY + CSV upload) ---
 @api_view(["POST"])
 @permission_classes([IsAdminUser])
 @parser_classes([MultiPartParser, FormParser])
 def train_view(request):
+    # Training is disabled in production (Render free plan limitation)
+    if not settings.ENABLE_TRAINING:
+        return Response(
+            {"error": "Training is disabled on this deployment. Please train locally and upload model.pkl."},
+            status=503
+        )
+    
+    # Only reaches here if ENABLE_TRAINING=True (local/development)
+    from .train import train_model
+    
     dataset = request.FILES.get("dataset")
 
     if not dataset:
@@ -49,6 +56,22 @@ def predict_view(request):
 
     if not (skills and qualification and experience):
         return Response({"error": "Missing fields"}, status=400)
+
+    # Check if model artifact exists
+    if not os.path.exists(settings.ML_MODEL_PATH):
+        return Response(
+            {"error": "ML model not found. Please ensure model.pkl is deployed to ml/saved_models/."},
+            status=503
+        )
+
+    # Lazy import to avoid heavy ML dependencies at app startup
+    try:
+        from .predict import predict_job_role
+    except ImportError as e:
+        return Response(
+            {"error": f"Failed to load ML module: {str(e)}"},
+            status=503
+        )
 
     job = predict_job_role(skills, qualification, experience)
 
