@@ -3,19 +3,10 @@ import pickle
 import numpy as np
 import pandas as pd
 from django.conf import settings
+from .artifacts import load_artifacts
 
 
 MODEL_PATH = settings.ML_MODEL_PATH
-
-
-def load_artifacts():
-    if not os.path.exists(MODEL_PATH):
-        raise FileNotFoundError("Model not trained yet.")
-
-    with open(MODEL_PATH, "rb") as f:
-        artifacts = pickle.load(f)
-
-    return artifacts
 
 
 def safe_encode(enc, value, fallback):
@@ -33,7 +24,6 @@ def predict_job_role(skills, qualification, experience_level):
 
     model = artifacts["model"]
     feature_cols = artifacts["feature_cols"]
-    vocab = artifacts["skill_vocab"]
     enc = artifacts["encoders"]
 
     # ---------- NORMALIZE INPUT ----------
