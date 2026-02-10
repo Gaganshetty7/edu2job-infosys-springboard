@@ -1,8 +1,9 @@
 import axios, { AxiosError } from "axios";
 import type { InternalAxiosRequestConfig } from "axios";
+import { API_BASE_URL } from "../config/api";
 
 const api = axios.create({
-  baseURL: `${import.meta.env.VITE_API_BASE}/api`, 
+  baseURL: `${API_BASE_URL}/api`, 
   withCredentials: true, 
 });
 
